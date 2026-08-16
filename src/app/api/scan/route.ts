@@ -18,6 +18,10 @@ export async function POST(request: NextRequest) {
     const result = await scanPhotos(user.id, files, location);
     return json(result);
   } catch (error) {
-    return fail(error instanceof Error ? error.message : "I couldn't read that photo. Tell me what you have instead.", 400);
+    const raw = error instanceof Error ? error.message : "I couldn't read that photo. Tell me what you have instead.";
+    const message = /ENOENT|EACCES|mkdir|\/var\/task/i.test(raw)
+      ? "I couldn't read that photo right now. Try again, or type what's in your kitchen."
+      : raw;
+    return fail(message, 400);
   }
 }

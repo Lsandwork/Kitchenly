@@ -182,22 +182,6 @@ export async function scanPhotos(userId: string, files: File[], locationHint?: K
 
   for (const file of files) {
     const processed = await processUpload(file);
-    const key = `${userId}/${nanoid()}.jpg`;
-    await store.put(key, processed.bytes, processed.mimeType);
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + scanRetentionDays());
-    await db.kitchenScan.create({
-      data: {
-        userId,
-        locationHint: locationHint ?? null,
-        storageKey: key,
-        mimeType: processed.mimeType,
-        byteSize: processed.bytes.length,
-        width: processed.width,
-        height: processed.height,
-        expiresAt,
-      },
-    });
 
     try {
       const analysis = await analyzeImage(processed.bytes, processed.mimeType, locationHint);
@@ -207,6 +191,28 @@ export async function scanPhotos(userId: string, files: File[], locationHint?: K
       const message = error instanceof Error ? error.message : String(error);
       visionErrors.push(message);
       logger.warn("scan.vision_failed", { error: message });
+    }
+
+    // Best-effort photo retention — scan still works if storage fails on serverless.
+    try {
+      const key = `${userId}/${nanoid()}.jpg`;
+      await store.put(key, processed.bytes, processed.mimeType);
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + scanRetentionDays());
+      await db.kitchenScan.create({
+        data: {
+          userId,
+          locationHint: locationHint ?? null,
+          storageKey: key,
+          mimeType: processed.mimeType,
+          byteSize: processed.bytes.length,
+          width: processed.width,
+          height: processed.height,
+          expiresAt,
+        },
+      });
+    } catch (error) {
+      logger.warn("scan.storage_failed", { error: String(error) });
     }
   }
 

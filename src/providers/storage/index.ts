@@ -1,4 +1,5 @@
 import { mkdir, unlink, writeFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { env, hasValue } from "@/lib/env";
 
@@ -7,8 +8,16 @@ export interface ObjectStore {
   delete(key: string): Promise<void>;
 }
 
+/** Writable upload directory — /tmp on Vercel/Lambda, local disk in dev. */
+export function uploadRoot() {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    return path.join(os.tmpdir(), "kf-uploads");
+  }
+  return path.join(process.cwd(), "data", "uploads");
+}
+
 class LocalDiskStore implements ObjectStore {
-  private root = path.join(process.cwd(), "data", "uploads");
+  private root = uploadRoot();
 
   async put(key: string, bytes: Buffer) {
     const full = path.join(this.root, key);
