@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { OWNED_RECIPES } from "@/data/owned-recipes";
 import { collectionBySlug, CURATED_COLLECTIONS } from "@/domain/recipes/collections";
 import { socialScoreFor, socialTrendFor } from "@/domain/recipes/trending";
@@ -46,43 +47,82 @@ function kitchenToInput(
   }));
 }
 
-export async function ensureRecipesSeeded() {
-  for (const recipe of OWNED_RECIPES) {
-    const data = recipeToSeedData(recipe);
-    await db.recipe.upsert({
-      where: { slug: recipe.slug },
-      update: {
-        imageUrl: data.imageUrl,
-        title: data.title,
-        description: data.description,
-        tagsJson: data.tagsJson,
-        ingredientsJson: data.ingredientsJson,
-        stepsJson: data.stepsJson,
-        dietsJson: data.dietsJson,
-        allergensJson: data.allergensJson,
-        equipmentJson: data.equipmentJson,
-        leftoverFriendly: data.leftoverFriendly,
-        seoTitle: data.seoTitle,
-        seoDescription: data.seoDescription,
-        status: "published",
-      },
-      create: { id: recipe.id, slug: recipe.slug, ...data },
-    });
-  }
+/** Columns the owned-recipe seed owns; anything else on the row is user/runtime data. */
+function seedColumns(data: ReturnType<typeof recipeToSeedData>) {
+  return {
+    imageUrl: data.imageUrl,
+    title: data.title,
+    description: data.description,
+    tagsJson: data.tagsJson,
+    ingredientsJson: data.ingredientsJson,
+    stepsJson: data.stepsJson,
+    dietsJson: data.dietsJson,
+    allergensJson: data.allergensJson,
+    equipmentJson: data.equipmentJson,
+    leftoverFriendly: data.leftoverFriendly,
+    seoTitle: data.seoTitle,
+    seoDescription: data.seoDescription,
+    status: "published",
+  };
 }
 
-export async function listPublishedRecipes() {
+async function syncOwnedRecipes() {
+  const existing = await db.recipe.findMany({
+    where: { slug: { in: OWNED_RECIPES.map((recipe) => recipe.slug) } },
+  });
+  const bySlug = new Map(existing.map((row) => [row.slug, row]));
+
+  const stale = OWNED_RECIPES.filter((recipe) => {
+    const row = bySlug.get(recipe.slug);
+    if (!row) return true;
+    const columns = seedColumns(recipeToSeedData(recipe));
+    return Object.entries(columns).some(
+      ([key, value]) => row[key as keyof typeof row] !== value,
+    );
+  });
+
+  if (!stale.length) return;
+  await Promise.all(
+    stale.map((recipe) => {
+      const data = recipeToSeedData(recipe);
+      return db.recipe.upsert({
+        where: { slug: recipe.slug },
+        update: seedColumns(data),
+        create: { id: recipe.id, slug: recipe.slug, ...data },
+      });
+    }),
+  );
+}
+
+let seedSync: Promise<void> | null = null;
+
+/**
+ * Seed data only changes on deploy, so sync at most once per server instance and
+ * write nothing when the rows already match. Re-seeding on every read cost ~23
+ * sequential round trips per request, which made recipe pages take ~10s.
+ */
+export function ensureRecipesSeeded() {
+  if (!seedSync) {
+    seedSync = syncOwnedRecipes().catch((error) => {
+      seedSync = null;
+      throw error;
+    });
+  }
+  return seedSync;
+}
+
+export const listPublishedRecipes = cache(async () => {
   await ensureRecipesSeeded();
   return db.recipe.findMany({
     where: { status: "published" },
     orderBy: [{ ratingAverage: "desc" }, { updatedAt: "desc" }],
   });
-}
+});
 
-export async function getRecipeBySlug(slug: string) {
+export const getRecipeBySlug = cache(async (slug: string) => {
   await ensureRecipesSeeded();
   return db.recipe.findFirst({ where: { slug, status: "published" } });
-}
+});
 
 function whyFor(match: MatchBreakdown, recipe: RecipeRecord) {
   if (match.state === "make_now") {
