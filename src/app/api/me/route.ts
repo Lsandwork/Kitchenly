@@ -4,7 +4,6 @@ import {
   changePassword,
   clearSessionCookie,
   deleteAccount,
-  ensureAdminUser,
   login,
   logout,
   register,
@@ -20,8 +19,6 @@ import { availableRecipeSources } from "@/providers/recipes";
 import { recordActivity } from "@/services/admin/activity";
 
 export async function GET() {
-  // Keep admin account healthy in local/prod without wiping kitchens on every request.
-  await ensureAdminUser().catch(() => undefined);
   const user = await requireUser();
   const [kitchen, prefs] = await Promise.all([getKitchen(user.id), getPreferences(user.id)]);
   void recordActivity({
