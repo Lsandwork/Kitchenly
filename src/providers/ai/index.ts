@@ -1,4 +1,5 @@
 import { env } from "@/lib/env";
+import { logger } from "@/lib/logger";
 import { AnthropicClient } from "@/providers/ai/anthropic";
 import { GoogleAIClient } from "@/providers/ai/google";
 import { OpenAIClient } from "@/providers/ai/openai";
@@ -37,13 +38,21 @@ export async function withAIFallback<T>(
 ): Promise<T> {
   const primary = configuredAI();
   if (!primary) throw new AIUnavailableError();
-  try {
-    return await run(primary);
-  } catch (error) {
-    const fallback = clients.find((client) => client.id !== primary.id && client.available());
-    if (!fallback) throw error;
-    return run(fallback);
+  const ordered = [primary, ...clients.filter((client) => client.id !== primary.id && client.available())];
+  let lastError: unknown;
+  for (const client of ordered) {
+    try {
+      return await run(client);
+    } catch (error) {
+      lastError = error;
+      logger.warn("ai.fallback_try_failed", {
+        task,
+        provider: client.id,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
   }
+  throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
 export { AIUnavailableError };

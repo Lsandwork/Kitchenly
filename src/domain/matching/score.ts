@@ -22,6 +22,8 @@ const IMPORTANCE_WEIGHT = {
 const COST_WEIGHT = { low: 1, medium: 2.2, high: 4 } as const;
 
 function assumedStaples(kitchen: KitchenItemInput[]) {
+  // Empty kitchen = no demo staples. Only assume salt/oil/pepper after the user has real inventory.
+  if (kitchen.length === 0) return [];
   const ids = new Set(kitchen.map((item) => item.canonicalId));
   return DEFAULT_PANTRY_STAPLES.filter((id) => !ids.has(id));
 }

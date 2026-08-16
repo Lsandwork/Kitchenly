@@ -13,10 +13,11 @@ function displayName(id: string) {
 export function findSubstitutions(
   missingCanonicalId: string,
   kitchen: KitchenItemInput[],
-  options?: { baking?: boolean; allergies?: string[] },
+  options?: { baking?: boolean; allergies?: string[]; requireOwned?: boolean },
 ): SubstitutionSuggestion[] {
   const allergies = new Set(options?.allergies ?? []);
   const baking = options?.baking ?? false;
+  const requireOwned = options?.requireOwned ?? true;
   const suggestions: SubstitutionSuggestion[] = [];
 
   for (const rule of SUBSTITUTION_RULES) {
@@ -24,26 +25,44 @@ export function findSubstitutions(
     if (baking && !rule.safeForBaking) continue;
 
     const targets = Array.isArray(rule.to) ? rule.to : [rule.to];
-    const available = targets.every((id) => {
-      if (id === "water") return true;
+    const allergyHit = targets.some((id) => {
       const ingredient = getIngredient(id);
-      if (ingredient?.allergens.some((allergen) => allergies.has(allergen))) return false;
+      return ingredient?.allergens.some((allergen) => allergies.has(allergen));
+    });
+    if (allergyHit) continue;
+
+    const owned = targets.every((id) => {
+      if (id === "water") return true;
       return kitchenHas(kitchen, id);
     });
-    if (!available) continue;
+    if (requireOwned && !owned) continue;
 
     suggestions.push({
       original: displayName(rule.from),
       originalCanonicalId: rule.from,
       substitute: targets.map(displayName).join(" + "),
       substituteCanonicalId: targets[0],
-      explanation: rule.explanation,
+      explanation: owned
+        ? `${rule.explanation} You already have ${targets.map(displayName).join(" + ")}.`
+        : rule.explanation,
       flavorImpact: rule.flavorImpact,
       safeForBaking: rule.safeForBaking,
     });
   }
 
-  return suggestions;
+  return suggestions.sort((a, b) => {
+    const aOwned = a.substituteCanonicalId && kitchenHas(kitchen, a.substituteCanonicalId) ? 0 : 1;
+    const bOwned = b.substituteCanonicalId && kitchenHas(kitchen, b.substituteCanonicalId) ? 0 : 1;
+    return aOwned - bOwned;
+  });
+}
+
+export function listAllSubstitutions(
+  missingCanonicalId: string,
+  kitchen: KitchenItemInput[],
+  options?: { baking?: boolean; allergies?: string[] },
+) {
+  return findSubstitutions(missingCanonicalId, kitchen, { ...options, requireOwned: false });
 }
 
 export function bestSubstitution(

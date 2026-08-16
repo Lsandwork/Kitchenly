@@ -125,29 +125,29 @@ export type KitchenItemInput = {
 };
 
 export const IngredientDetectionSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1),
   canonicalIngredientId: z.string().optional(),
-  quantity: z.number().optional(),
-  unit: z.string().optional(),
-  quantityNote: z.string().optional(),
-  location: KitchenLocationSchema.optional(),
-  category: z.string().optional(),
-  brand: z.string().optional(),
-  packageSize: z.string().optional(),
-  freshness: z.string().optional(),
-  confidence: z.number().min(0).max(1),
-  likelyUsable: z.boolean().optional(),
-  isStaple: z.boolean().optional(),
-  expirationVisible: z.string().optional(),
-  notes: z.string().optional(),
+  quantity: z.number().optional().nullable().transform((v) => v ?? undefined),
+  unit: z.string().optional().nullable().transform((v) => v ?? undefined),
+  quantityNote: z.string().optional().nullable().transform((v) => v ?? undefined),
+  location: KitchenLocationSchema.optional().catch("unknown"),
+  category: z.string().optional().nullable().transform((v) => v ?? undefined),
+  brand: z.string().optional().nullable().transform((v) => v ?? undefined),
+  packageSize: z.string().optional().nullable().transform((v) => v ?? undefined),
+  freshness: z.string().optional().nullable().transform((v) => v ?? undefined),
+  confidence: z.coerce.number().min(0).max(1).catch(0.55),
+  likelyUsable: z.boolean().optional().catch(true),
+  isStaple: z.boolean().optional().catch(false),
+  expirationVisible: z.string().optional().nullable().transform((v) => v ?? undefined),
+  notes: z.string().optional().nullable().transform((v) => v ?? undefined),
 });
 export type IngredientDetection = z.infer<typeof IngredientDetectionSchema>;
 
 export const VisionAnalysisSchema = z.object({
-  locationGuess: KitchenLocationSchema.optional(),
-  items: z.array(IngredientDetectionSchema),
-  overallConfidence: z.number().min(0).max(1),
-  commentary: z.string(),
+  locationGuess: KitchenLocationSchema.optional().catch("unknown"),
+  items: z.array(IngredientDetectionSchema).default([]),
+  overallConfidence: z.coerce.number().min(0).max(1).catch(0.5),
+  commentary: z.string().default(""),
 });
 export type VisionAnalysis = z.infer<typeof VisionAnalysisSchema>;
 
@@ -176,6 +176,7 @@ export type RecipeRecord = {
   origin: "owned" | "external" | "generated";
   sourceName?: string | null;
   sourceUrl?: string | null;
+  sourceId?: string | null;
   imageUrl?: string | null;
   servings: number;
   prepMinutes?: number | null;

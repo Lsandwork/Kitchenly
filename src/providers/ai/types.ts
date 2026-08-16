@@ -35,10 +35,11 @@ export class AIUnavailableError extends Error {
 }
 
 export function modelFor(task: AITask, env: Record<string, string | undefined>) {
-  if (task === "vision") return env.AI_VISION_MODEL || env.AI_REASONING_MODEL || "gpt-5.6-terra";
-  if (task === "fast") return env.AI_FAST_MODEL || "gpt-5.6-luna";
+  // Production OpenAI defaults — must be real vision-capable model IDs.
+  if (task === "vision") return env.AI_VISION_MODEL || env.AI_REASONING_MODEL || "gpt-4o";
+  if (task === "fast") return env.AI_FAST_MODEL || "gpt-4o-mini";
   if (task === "embedding") return env.AI_EMBEDDING_MODEL || "text-embedding-3-large";
-  return env.AI_REASONING_MODEL || env.AI_VISION_MODEL || "gpt-5.6-terra";
+  return env.AI_REASONING_MODEL || env.AI_VISION_MODEL || "gpt-4o";
 }
 
 export function jsonSchemaOf(schemaName: string) {

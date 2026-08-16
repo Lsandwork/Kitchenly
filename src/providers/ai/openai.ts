@@ -48,11 +48,22 @@ export class OpenAIClient implements AIClient {
   }
 
   async completeStructured<T>(request: StructuredRequest<T>): Promise<T> {
+    const messages = request.messages.map((message) => toMessage(message));
+    const mentionsJson = messages.some((message) => {
+      const content = typeof message.content === "string" ? message.content : JSON.stringify(message.content);
+      return /json/i.test(content);
+    });
+    if (!mentionsJson) {
+      messages.push({
+        role: "user",
+        content: `Respond with a single JSON object for ${request.schemaName}.`,
+      });
+    }
     const completion = await this.api().chat.completions.create({
       model: this.model(request.task),
       temperature: request.temperature ?? 0.3,
       response_format: { type: "json_object" },
-      messages: request.messages.map((message) => toMessage(message)),
+      messages,
     });
     const raw = completion.choices[0]?.message?.content ?? "{}";
     try {

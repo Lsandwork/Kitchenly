@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Button, Chip } from "@/components/ui";
+import { LeafIcon } from "@/components/kf/icons";
+import { Button, Chip, PageShell, SurfaceCard } from "@/components/ui";
 
 type Item = {
   id: string;
@@ -79,16 +80,33 @@ export default function KitchenPage() {
   }, {});
 
   const lastToken = text.split(/[\s,]+/).at(-1)?.toLowerCase() || "";
+  const useSoon = items.filter((item) => item.useSoon);
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
-      <p className="text-sm font-bold uppercase tracking-[0.18em] text-terracotta">Kitchen memory</p>
-      <h1 className="display mt-2 text-4xl font-semibold">What you actually have.</h1>
-      <p className="mt-3 text-lg text-ink-soft">
+    <PageShell narrow>
+      <p className="kf-eyebrow">
+        <LeafIcon size={14} />
+        Kitchen memory
+      </p>
+      <h1 className="display mt-3 text-4xl font-semibold">What you actually have.</h1>
+      <p className="mt-3 text-lg text-[var(--kf-text-muted)]">
         {typing
           ? "Prefer typing? Tell me what you've got — a messy sentence is perfect."
           : "Tap to fix quantities, mark leftovers, or say you used something."}
       </p>
+
+      {useSoon.length ? (
+        <SurfaceCard className="mt-6 p-5">
+          <p className="kf-eyebrow">Use soon</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {useSoon.map((item) => (
+              <Chip key={item.id} active onClick={() => void patch(item, { useSoon: false })}>
+                {item.name}
+              </Chip>
+            ))}
+          </div>
+        </SurfaceCard>
+      ) : null}
 
       <form
         className="mt-6 space-y-3"
@@ -106,7 +124,7 @@ export default function KitchenPage() {
           onChange={(event) => setText(event.target.value)}
           rows={3}
           placeholder="I have chicken, rice, onions, half a bell pepper, spinach, eggs, cheddar, milk and tortillas."
-          className="w-full rounded-3xl border border-[var(--line)] bg-cream p-4 text-lg"
+          className="w-full rounded-[28px] border border-[var(--kf-border-strong)] bg-[var(--kf-surface-elevated)] p-4 text-lg shadow-[var(--kf-shadow-subtle)] outline-none focus:border-[color-mix(in_srgb,var(--kf-terracotta)_40%,var(--kf-border-strong))]"
         />
         <div className="flex flex-wrap gap-2">
           {suggestions
@@ -122,7 +140,9 @@ export default function KitchenPage() {
             ))}
         </div>
         <div className="flex flex-wrap gap-3">
-          <Button type="submit">Add to my kitchen</Button>
+          <Button type="submit" tone="olive">
+            Add to my kitchen
+          </Button>
           <Button
             type="button"
             tone="secondary"
@@ -174,29 +194,31 @@ export default function KitchenPage() {
             <h2 className="display text-2xl capitalize">{location}</h2>
             <ul className="mt-3 space-y-2">
               {list.map((item) => (
-                <li key={item.id} className="paper-card flex flex-col gap-3 rounded-2xl px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="font-bold">
-                      {item.name}
-                      {item.quantity ? ` · ${item.quantity}${item.unit ? ` ${item.unit}` : ""}` : ""}
-                    </p>
-                    <p className="text-sm text-ink-soft">
-                      {item.isLeftover ? "Leftover · " : ""}
-                      {item.useSoon ? "Use soon · " : ""}
-                      {item.confidence < 0.7 ? "I wasn't sure" : "Confirmed"}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Chip onClick={() => void patch(item, { useSoon: !item.useSoon })}>Use soon</Chip>
-                    <Chip onClick={() => void patch(item, { isLeftover: !item.isLeftover })}>Leftover</Chip>
-                    <Chip onClick={() => void remove(item)}>Used it</Chip>
-                  </div>
+                <li key={item.id}>
+                  <SurfaceCard className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="font-bold">
+                        {item.name}
+                        {item.quantity ? ` · ${item.quantity}${item.unit ? ` ${item.unit}` : ""}` : ""}
+                      </p>
+                      <p className="text-sm text-[var(--kf-text-muted)]">
+                        {item.isLeftover ? "Leftover · " : ""}
+                        {item.useSoon ? "Use soon · " : ""}
+                        {item.confidence < 0.7 ? "I wasn't sure" : "Confirmed"}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Chip onClick={() => void patch(item, { useSoon: !item.useSoon })}>Use soon</Chip>
+                      <Chip onClick={() => void patch(item, { isLeftover: !item.isLeftover })}>Leftover</Chip>
+                      <Chip onClick={() => void remove(item)}>Used it</Chip>
+                    </div>
+                  </SurfaceCard>
                 </li>
               ))}
             </ul>
           </section>
         ))}
       </div>
-    </main>
+    </PageShell>
   );
 }

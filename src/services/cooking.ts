@@ -10,7 +10,7 @@ export async function startCooking(userId: string, recipe: RecipeRecord, serving
   return db.cookingSession.create({
     data: {
       userId,
-      recipeId: null,
+      recipeId: recipe.id.startsWith("owned-") ? null : recipe.id,
       title: scaled.title,
       servings: scaled.servings,
       stepsJson: JSON.stringify(scaled.steps),
@@ -21,9 +21,16 @@ export async function startCooking(userId: string, recipe: RecipeRecord, serving
 }
 
 export async function getSession(userId: string, id: string) {
-  const session = await db.cookingSession.findFirst({ where: { id, userId } });
+  const session = await db.cookingSession.findFirst({
+    where: { id, userId },
+    include: { recipe: true },
+  });
   if (!session) return null;
-  return { ...session, steps: JSON.parse(session.stepsJson) as RecipeRecord["steps"] };
+  return {
+    ...session,
+    steps: JSON.parse(session.stepsJson) as RecipeRecord["steps"],
+    recipeSlug: session.recipe?.slug ?? null,
+  };
 }
 
 export async function advanceSession(userId: string, id: string, delta: number) {

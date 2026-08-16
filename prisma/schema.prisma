@@ -12,6 +12,7 @@ model User {
   email        String?   @unique
   passwordHash String?
   name         String?
+  role         String    @default("user")
   guestToken   String    @unique
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
@@ -29,6 +30,121 @@ model User {
   recipeMatches        RecipeMatch[]
   generatedRecipes     GeneratedRecipe[]
   corrections          IngredientCorrection[]
+  recipeNotes          RecipeNote[]
+  recipeVersions       RecipeVersion[]
+  mealPlanEntries      MealPlanEntry[]
+  cookHistory          CookHistory[]
+  recipeRatings        RecipeRating[]
+  collections          UserCollection[]
+  emailLogs            EmailSendLog[]
+  activityEvents       UserActivityEvent[]
+  analyticsEvents      AnalyticsEvent[]
+  blogPostsAuthored    BlogPost[]            @relation("BlogAuthor")
+  socialPostsAuthored  SocialPost[]          @relation("SocialAuthor")
+  adminAudits          AdminAuditLog[]       @relation("AdminActor")
+}
+
+model UserActivityEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  type      String
+  path      String?
+  metaJson  String   @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+  @@index([createdAt])
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  event     String
+  path      String?
+  referrer  String?
+  metaJson  String   @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([event, createdAt])
+  @@index([userId, createdAt])
+  @@index([createdAt])
+}
+
+model BlogPost {
+  id              String    @id @default(cuid())
+  slug            String    @unique
+  title           String
+  excerpt         String    @default("")
+  bodyMarkdown    String    @default("")
+  coverImageUrl   String?
+  status          String    @default("draft") // draft | review | approved | scheduled | published
+  tagsJson        String    @default("[]")
+  category        String?
+  seoTitle        String?
+  seoDescription  String?
+  scheduledFor    DateTime?
+  publishedAt     DateTime?
+  authorId        String?
+  author          User?     @relation("BlogAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status, publishedAt])
+  @@index([scheduledFor])
+}
+
+model SocialPost {
+  id            String    @id @default(cuid())
+  platform      String    // instagram | x | facebook | tiktok | linkedin | threads
+  caption       String
+  mediaUrl      String?
+  hashtagsJson  String    @default("[]")
+  status        String    @default("draft") // draft | scheduled | published | failed
+  scheduledFor  DateTime?
+  publishedAt   DateTime?
+  linkedBlogId  String?
+  authorId      String?
+  author        User?     @relation("SocialAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  metaJson      String    @default("{}")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([platform, status, scheduledFor])
+  @@index([scheduledFor])
+}
+
+model EmailCampaign {
+  id            String    @id @default(cuid())
+  name          String
+  subject       String
+  previewText   String    @default("")
+  bodyHtml      String    @default("")
+  status        String    @default("draft") // draft | scheduled | sending | sent | cancelled
+  audienceJson  String    @default("{\"segment\":\"all_users\"}")
+  scheduledFor  DateTime?
+  sentAt        DateTime?
+  statsJson     String    @default("{\"sent\":0,\"opened\":0,\"clicked\":0,\"bounced\":0}")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status, scheduledFor])
+}
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  actorId    String?
+  actor      User?    @relation("AdminActor", fields: [actorId], references: [id], onDelete: SetNull)
+  action     String
+  targetType String?
+  targetId   String?
+  detailJson String   @default("{}")
+  createdAt  DateTime @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
 }
 
 model Profile {
@@ -116,115 +232,136 @@ model IngredientCorrection {
 }
 
 model Recipe {
-  id              String   @id @default(cuid())
-  slug            String   @unique
-  title           String
-  description     String
-  origin          String
-  sourceName      String?
-  sourceUrl       String?
-  sourceId        String?
-  imageUrl        String?
-  servings        Int      @default(2)
-  prepMinutes     Int?
-  cookMinutes     Int?
-  totalMinutes    Int?
-  difficulty      String   @default("easy")
-  cuisine         String?
-  mealType        String?
-  dietsJson       String   @default("[]")
-  allergensJson   String   @default("[]")
-  equipmentJson   String   @default("[]")
-  ingredientsJson String
-  stepsJson       String
-  tagsJson        String   @default("[]")
-  leftoverFriendly Boolean @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                   String    @id @default(cuid())
+  slug                 String    @unique
+  title                String
+  subtitle             String?
+  description          String
+  seoTitle             String?
+  seoDescription       String?
+  origin               String
+  sourceName           String?
+  sourceUrl            String?
+  sourceId             String?
+  imageUrl             String?
+  status               String    @default("published")
+  publishedAt          DateTime  @default(now())
+  servings             Int       @default(2)
+  prepMinutes          Int?
+  cookMinutes          Int?
+  totalMinutes         Int?
+  difficulty           String    @default("easy")
+  cuisine              String?
+  mealType             String?
+  dietsJson            String    @default("[]")
+  allergensJson        String    @default("[]")
+  equipmentJson        String    @default("[]")
+  cookingMethodsJson   String    @default("[]")
+  ingredientsJson      String
+  stepsJson            String
+  tagsJson             String    @default("[]")
+  tipsJson             String    @default("[]")
+  leftoverFriendly     Boolean   @default(false)
+  storageInstructions  String?
+  leftoverInstructions String?
+  estimatedCostCents   Int?
+  ratingAverage        Float     @default(0)
+  ratingCount          Int       @default(0)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
-  matches RecipeMatch[]
-  feedback RecipeFeedback[]
-  saved    SavedRecipe[]
-  sessions CookingSession[]
+  matches      RecipeMatch[]
+  feedback     RecipeFeedback[]
+  saved        SavedRecipe[]
+  sessions     CookingSession[]
+  notes        RecipeNote[]
+  versions     RecipeVersion[]
+  mealPlan     MealPlanEntry[]
+  history      CookHistory[]
+  ratings      RecipeRating[]
+  collections  UserCollectionItem[]
 
   @@index([origin])
   @@index([cuisine])
+  @@index([status, publishedAt])
+  @@index([mealType])
+  @@index([totalMinutes])
 }
 
 model GeneratedRecipe {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title           String
-  description     String
-  servings        Int
-  prepMinutes     Int?
-  cookMinutes     Int?
-  totalMinutes    Int?
-  difficulty      String
-  cuisine         String?
-  dietsJson       String
-  allergensJson   String
-  equipmentJson   String
-  ingredientsJson String
-  stepsJson       String
-  substitutionsJson String @default("[]")
-  validationJson  String
-  createdAt       DateTime @default(now())
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title             String
+  description       String
+  servings          Int
+  prepMinutes       Int?
+  cookMinutes       Int?
+  totalMinutes      Int?
+  difficulty        String
+  cuisine           String?
+  dietsJson         String
+  allergensJson     String
+  equipmentJson     String
+  ingredientsJson   String
+  stepsJson         String
+  substitutionsJson String   @default("[]")
+  validationJson    String
+  createdAt         DateTime @default(now())
 }
 
 model RecipeMatch {
-  id                 String   @id @default(cuid())
-  userId             String
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipeId           String?
-  recipe             Recipe?  @relation(fields: [recipeId], references: [id], onDelete: SetNull)
-  generatedRecipeId  String?
-  state              String
-  score              Float
-  explanation        String
-  availableJson      String
-  missingJson        String
-  substitutionsJson  String
-  createdAt          DateTime @default(now())
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeId          String?
+  recipe            Recipe?  @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+  generatedRecipeId String?
+  state             String
+  score             Float
+  explanation       String
+  availableJson     String
+  missingJson       String
+  substitutionsJson String
+  createdAt         DateTime @default(now())
 
   @@index([userId, createdAt])
 }
 
 model ShoppingList {
-  id        String   @id @default(cuid())
+  id        String             @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String
-  recipeIds String   @default("[]")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  recipeIds String             @default("[]")
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
   items     ShoppingListItem[]
 }
 
 model ShoppingListItem {
-  id              String       @id @default(cuid())
-  listId          String
-  list            ShoppingList @relation(fields: [listId], references: [id], onDelete: Cascade)
-  canonicalId     String?
-  name            String
-  quantity        Float?
-  unit            String?
-  status          String       @default("need")
-  substituteFor   String?
-  estimatedCost   Float?
-  storeGroup      String?
-  notes           String?
-  createdAt       DateTime     @default(now())
+  id            String       @id @default(cuid())
+  listId        String
+  list          ShoppingList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  canonicalId   String?
+  name          String
+  quantity      Float?
+  unit          String?
+  status        String       @default("need")
+  substituteFor String?
+  estimatedCost Float?
+  storeGroup    String?
+  notes         String?
+  createdAt     DateTime     @default(now())
 }
 
 model Conversation {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   title     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   messages  Message[]
 }
 
@@ -241,19 +378,19 @@ model Message {
 }
 
 model CookingSession {
-  id            String    @id @default(cuid())
-  userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipeId      String?
-  recipe        Recipe?   @relation(fields: [recipeId], references: [id], onDelete: SetNull)
-  title         String
-  stepsJson     String
-  currentStep   Int       @default(0)
-  servings      Int       @default(2)
-  status        String    @default("active")
-  notesJson     String    @default("[]")
-  startedAt     DateTime  @default(now())
-  completedAt   DateTime?
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeId    String?
+  recipe      Recipe?   @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+  title       String
+  stepsJson   String
+  currentStep Int       @default(0)
+  servings    Int       @default(2)
+  status      String    @default("active")
+  notesJson   String    @default("[]")
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
 }
 
 model RecipeFeedback {
@@ -278,4 +415,121 @@ model SavedRecipe {
   createdAt DateTime @default(now())
 
   @@unique([userId, recipeId])
+}
+
+model RecipeNote {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeId  String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, recipeId])
+}
+
+model RecipeVersion {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeId        String?
+  recipe          Recipe?  @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+  title           String
+  description     String   @default("")
+  servings        Int      @default(2)
+  ingredientsJson String
+  stepsJson       String
+  changesJson     String   @default("[]")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId, createdAt])
+}
+
+model MealPlanEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      DateTime
+  mealType  String   @default("dinner")
+  recipeId  String?
+  recipe    Recipe?  @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+  title     String
+  servings  Int      @default(2)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, date])
+}
+
+model CookHistory {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeId       String?
+  recipe         Recipe?  @relation(fields: [recipeId], references: [id], onDelete: SetNull)
+  title          String
+  cookedAt       DateTime @default(now())
+  rating         String?
+  leftoversJson  String   @default("[]")
+  depletionJson  String   @default("[]")
+  notes          String?
+
+  @@index([userId, cookedAt])
+}
+
+model RecipeRating {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipeId  String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  stars     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, recipeId])
+  @@index([recipeId])
+}
+
+model UserCollection {
+  id          String               @id @default(cuid())
+  userId      String
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  items       UserCollectionItem[]
+
+  @@index([userId])
+}
+
+model UserCollectionItem {
+  id           String         @id @default(cuid())
+  collectionId String
+  collection   UserCollection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  recipeId     String
+  recipe       Recipe         @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  createdAt    DateTime       @default(now())
+
+  @@unique([collectionId, recipeId])
+}
+
+model EmailSendLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  toEmail     String
+  kind        String
+  subject     String
+  payloadJson String
+  status      String
+  providerId  String?
+  createdAt   DateTime @default(now())
+
+  @@index([userId, createdAt])
 }

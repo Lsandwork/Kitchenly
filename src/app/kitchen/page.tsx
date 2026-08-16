@@ -3,7 +3,7 @@ import KitchenPage from "./kitchen-client";
 
 export default function Page() {
   return (
-    <Suspense fallback={<main className="px-4 py-10">Opening your kitchen...</main>}>
+    <Suspense fallback={<main className="kf-page py-10 text-[var(--kf-text-muted)]">Opening your kitchen...</main>}>
       <KitchenPage />
     </Suspense>
   );

@@ -1,35 +1,51 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Nunito } from "next/font/google";
-import { Nav } from "@/components/nav";
+import { Cormorant_Garamond, Plus_Jakarta_Sans } from "next/font/google";
+import { AppHeader } from "@/components/nav";
 import "./globals.css";
 
-const fraunces = Fraunces({
+const cormorant = Cormorant_Garamond({
   variable: "--font-fraunces",
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
 });
 
-const nunito = Nunito({
-  variable: "--font-nunito",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
+  display: "swap",
 });
-
-export const metadata: Metadata = {
-  title: "Kitchen Friend",
-  description: "Show me what you've got. I'll figure out dinner.",
-};
 
 export const viewport: Viewport = {
-  themeColor: "#f3eadc",
+  themeColor: "#F7F3EC",
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
+};
+
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.APP_URL || "https://kitchen-friend.vercel.app"),
+  title: {
+    default: "Kitchen Friend",
+    template: "%s | Kitchen Friend",
+  },
+  description: "Turn what's in your kitchen into tonight's dinner.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Kitchen Friend",
+  },
+  formatDetection: {
+    telephone: false,
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${fraunces.variable} ${nunito.variable} h-full antialiased`}>
-      <body className="grain min-h-full flex flex-col text-ink">
-        <Nav />
-        <div className="flex-1">{children}</div>
+    <html lang="en" className={`${cormorant.variable} ${jakarta.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col text-ink kf-app-shell">
+        <AppHeader />
+        <div className="kf-app-main flex-1">{children}</div>
       </body>
     </html>
   );

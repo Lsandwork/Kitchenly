@@ -2,7 +2,6 @@ import { env, hasValue } from "@/lib/env";
 import { logger } from "@/lib/logger";
 import {
   AIUnavailableError,
-  modelFor,
   parseJson,
   type AIClient,
   type AIMessage,
@@ -18,7 +17,12 @@ export class GoogleAIClient implements AIClient {
   }
 
   private model(task: AITask) {
-    return env().AI_VISION_MODEL || env().AI_REASONING_MODEL || modelFor(task, env());
+    const configured = env().AI_VISION_MODEL || env().AI_REASONING_MODEL || env().AI_FAST_MODEL;
+    // Ignore OpenAI-style IDs when calling Google.
+    if (configured && !/^gpt-|^o[0-9]|^text-embedding/i.test(configured)) return configured;
+    if (task === "vision") return "gemini-2.5-flash";
+    if (task === "fast") return "gemini-2.5-flash";
+    return "gemini-2.5-flash";
   }
 
   async completeStructured<T>(request: StructuredRequest<T>): Promise<T> {

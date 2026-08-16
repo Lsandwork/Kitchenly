@@ -4,6 +4,7 @@ const EnvSchema = z.object({
   NODE_ENV: z.string().optional(),
   APP_URL: z.string().optional(),
   AUTH_SECRET: z.string().optional(),
+  ADMIN_PASSWORD: z.string().optional(),
   DATABASE_URL: z.string().optional(),
   SCAN_RETENTION_DAYS: z.string().optional(),
   AI_PROVIDER: z.string().optional(),
@@ -32,6 +33,8 @@ const EnvSchema = z.object({
   STORAGE_SECRET_KEY: z.string().optional(),
   STORAGE_ENDPOINT: z.string().optional(),
   STORAGE_PUBLIC_URL: z.string().optional(),
+  RESEND_API_KEY: z.string().optional(),
+  EMAIL_FROM: z.string().optional(),
 });
 
 export type AppEnv = z.infer<typeof EnvSchema>;

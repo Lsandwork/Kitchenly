@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Chip } from "@/components/ui";
+import { CartIcon } from "@/components/kf/icons";
+import { Button, Chip, PageShell, SurfaceCard } from "@/components/ui";
 
 type Offer = {
   stores: {
@@ -62,28 +63,46 @@ export default function ShopPage() {
   }
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
-      <p className="text-sm font-bold uppercase tracking-[0.18em] text-terracotta">Need a few things?</p>
-      <h1 className="display mt-2 text-4xl font-semibold">Let&apos;s get you what you&apos;re missing</h1>
-      <p className="mt-3 text-lg text-ink-soft">{title}</p>
+    <PageShell narrow>
+      <p className="kf-eyebrow">
+        <CartIcon size={14} />
+        Need a few things?
+      </p>
+      <h1 className="display mt-3 text-4xl font-semibold">Let&apos;s get you what you&apos;re missing</h1>
+      <p className="mt-3 text-lg text-[var(--kf-text-muted)]">{title}</p>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <SurfaceCard className="p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--kf-terracotta)]">Need</p>
+          <p className="mt-1 display text-2xl">{items.length}</p>
+        </SurfaceCard>
+        <SurfaceCard className="p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--kf-text-muted)]">Maybe</p>
+          <p className="mt-1 display text-2xl">0</p>
+        </SurfaceCard>
+        <SurfaceCard className="p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--kf-olive)]">Already have</p>
+          <p className="mt-1 display text-2xl">—</p>
+        </SurfaceCard>
+      </div>
 
       <ul className="mt-6 space-y-2">
         {items.length ? (
           items.map((item) => (
-            <li key={item.name} className="paper-card flex items-center justify-between rounded-2xl px-4 py-3">
-              <span className="font-bold">
-                {item.quantity ? `${item.quantity} ${item.unit ?? ""} ` : ""}
-                {item.name}
-              </span>
-              <Chip
-                onClick={() => setItems((current) => current.filter((row) => row.name !== item.name))}
-              >
-                Already have this
-              </Chip>
+            <li key={item.name}>
+              <SurfaceCard className="flex items-center justify-between px-4 py-3">
+                <span className="font-bold">
+                  {item.quantity ? `${item.quantity} ${item.unit ?? ""} ` : ""}
+                  {item.name}
+                </span>
+                <Chip onClick={() => setItems((current) => current.filter((row) => row.name !== item.name))}>
+                  Already have this
+                </Chip>
+              </SurfaceCard>
             </li>
           ))
         ) : (
-          <li className="text-ink-soft">Nothing to buy — you already have everything.</li>
+          <li className="text-[var(--kf-text-muted)]">Nothing to buy — you already have everything.</li>
         )}
       </ul>
 
@@ -96,9 +115,9 @@ export default function ShopPage() {
             id="postal"
             value={postal}
             onChange={(event) => setPostal(event.target.value)}
-            className="min-h-12 w-full rounded-full border border-[var(--line)] bg-cream px-4"
+            className="min-h-12 w-full rounded-full border border-[var(--kf-border-strong)] bg-[var(--kf-surface-elevated)] px-4 shadow-[var(--kf-shadow-subtle)] outline-none"
           />
-          <Button className="w-full min-h-14 text-lg" disabled={busy} onClick={() => void locate()}>
+          <Button className="w-full min-h-14 text-lg" tone="olive" disabled={busy} onClick={() => void locate()}>
             Find these ingredients locally?
           </Button>
         </div>
@@ -108,16 +127,22 @@ export default function ShopPage() {
         <section className="mt-10 space-y-6">
           <div>
             <h2 className="display text-3xl">Nearby</h2>
-            <p className="mt-2 text-ink-soft">{offer.disclaimer}</p>
+            <p className="mt-2 text-[var(--kf-text-muted)]">{offer.disclaimer}</p>
             <div className="mt-4 space-y-3">
               {offer.stores.map((store) => (
-                <a key={store.id} href={store.mapsUrl} target="_blank" rel="noreferrer" className="paper-card block rounded-3xl p-4">
-                  <p className="font-bold">{store.name}</p>
-                  <p className="text-sm text-ink-soft">
-                    {store.distanceMiles ? `${store.distanceMiles} miles · ` : ""}
-                    {store.availability === "likely" ? "Likely has it" : store.availability === "confirmed" ? "Confirmed available" : "Search nearby"}
-                  </p>
-                  <p className="text-sm text-ink-soft">{store.availabilityNote}</p>
+                <a key={store.id} href={store.mapsUrl} target="_blank" rel="noreferrer" className="block">
+                  <SurfaceCard className="p-4 hover:shadow-[var(--kf-shadow-floating)]">
+                    <p className="font-bold">{store.name}</p>
+                    <p className="text-sm text-[var(--kf-text-muted)]">
+                      {store.distanceMiles ? `${store.distanceMiles} miles · ` : ""}
+                      {store.availability === "likely"
+                        ? "Likely has it"
+                        : store.availability === "confirmed"
+                          ? "Confirmed available"
+                          : "Search nearby"}
+                    </p>
+                    <p className="text-sm text-[var(--kf-text-muted)]">{store.availabilityNote}</p>
+                  </SurfaceCard>
                 </a>
               ))}
             </div>
@@ -127,21 +152,26 @@ export default function ShopPage() {
               <h2 className="display text-3xl">Delivery</h2>
               <div className="mt-4 space-y-3">
                 {offer.delivery.map((option) => (
-                  <div key={option.provider} className="paper-card rounded-3xl p-4">
+                  <SurfaceCard key={option.provider} className="p-4">
                     <p className="font-bold">{option.label}</p>
-                    <p className="text-sm text-ink-soft">{option.note}</p>
+                    <p className="text-sm text-[var(--kf-text-muted)]">{option.note}</p>
                     {option.href ? (
-                      <a className="mt-3 inline-flex min-h-12 items-center font-bold text-terracotta" href={option.href} target="_blank" rel="noreferrer">
+                      <a
+                        className="mt-3 inline-flex min-h-12 items-center font-bold text-[var(--kf-terracotta)]"
+                        href={option.href}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         {option.cta}
                       </a>
                     ) : null}
-                  </div>
+                  </SurfaceCard>
                 ))}
               </div>
             </div>
           ) : null}
         </section>
       ) : null}
-    </main>
+    </PageShell>
   );
 }
