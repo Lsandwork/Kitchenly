@@ -1,38 +1,68 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kitchen Friend
 
-## Getting Started
+An AI kitchen companion that looks at what you actually have, decides what you should cook, substitutes when it should, shops only for the gap, and walks you through dinner.
 
-First, run the development server:
+This is not a chatbot wrapped around a recipe dump. The product loop is:
+
+**See → Understand → Decide → Substitute → Shop → Cook → Remember**
+
+## Run it
 
 ```bash
+npm install
+npm run setup
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+You can use the app immediately without API keys:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Type what you have
+- Get ranked recipes from the owned corpus (and TheMealDB when the network is available)
+- See make-now vs almost-there vs original recipes
+- Build a minimum shopping list
+- Cook in a large-step, messy-hands mode
 
-## Learn More
+Add keys in `.env` to unlock more:
 
-To learn more about Next.js, take a look at the following resources:
+| Variable | What it enables |
+| --- | --- |
+| `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, or `GOOGLE_AI_API_KEY` | Fridge vision, conversational polish, original recipe generation |
+| `AI_VISION_MODEL` / `AI_REASONING_MODEL` / `AI_FAST_MODEL` | Model routing — change models without rewriting the app |
+| `SPOONACULAR_API_KEY` | Additional published recipe retrieval with source links |
+| `INSTACART_API_KEY` | Missing-ingredient shopping list pages via current Instacart Developer Platform (`POST /idp/v1/products/products_link`) |
+| `GOOGLE_MAPS_API_KEY` | Nearby grocery discovery via Places API (New) `places:searchNearby` |
+| `DOORDASH_*` / `UBER_*` | Adapter present; unused until partner access exists. The UI will not pretend live inventory. |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Never put secrets in client code. They stay on the server.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## What is real vs generated
 
-## Deploy on Vercel
+- **Existing recipes** from TheMealDB / Spoonacular keep their source name and URL. The app does not scrape copyrighted sites.
+- **Kitchen Friend originals** live in `src/data/owned-recipes.ts` and are labeled as original.
+- **AI-created recipes** are labeled “I made this one for your kitchen” and never presented as published.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Store hours, shelf inventory, prices, and ratings are never invented. If a grocery API is not configured, you get local Maps search and a clear “likely nearby” disclaimer.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# Kitchenly
-# Kitchenly
+## Architecture
+
+```
+UI
+ ↓
+Application services (kitchen, scan, recommend, conversation, cooking, shopping)
+ ↓
+Domain (normalization, matching, substitutions, personality, quality checks)
+ ↓
+Provider adapters (AI, recipes, Instacart, Places, DoorDash, Uber Eats, storage)
+```
+
+SQLite is the local database so the app runs on a laptop. The Prisma schema is relational and production-shaped; point `DATABASE_URL` at PostgreSQL for production.
+
+## Tests
+
+```bash
+npm test
+```
+
+Covers ingredient aliases, spoken pantry parsing, substitutions, allergy hard-stops, minimum shopping, list merging, and provider honesty.

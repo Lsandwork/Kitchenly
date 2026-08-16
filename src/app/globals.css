@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #f3eadc;
+  --paper-deep: #e6d8c4;
+  --cream: #fff8ee;
+  --ink: #24160f;
+  --ink-soft: #5b4638;
+  --line: rgba(36, 22, 15, 0.12);
+  --terracotta: #c24b1d;
+  --terracotta-deep: #9a3812;
+  --olive: #3e5133;
+  --sage: #8b9b76;
+  --butter: #e3bf5a;
+  --tomato: #b83a22;
+  --shadow: 0 24px 60px rgba(36, 22, 15, 0.12);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-cream: var(--cream);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-terracotta: var(--terracotta);
+  --color-olive: var(--olive);
+  --color-sage: var(--sage);
+  --color-butter: var(--butter);
+  --color-tomato: var(--tomato);
+  --font-sans: var(--font-nunito);
+  --font-display: var(--font-fraunces);
+}
+
+* {
+  border-color: var(--line);
+}
+
+html {
+  background: var(--paper);
+}
+
+body {
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(226, 191, 90, 0.18), transparent 50%),
+    radial-gradient(900px 500px at 110% 10%, rgba(194, 75, 29, 0.12), transparent 46%),
+    linear-gradient(180deg, #f7f0e4 0%, var(--paper) 32%, #efe4d3 100%);
+  color: var(--ink);
+  font-family: var(--font-nunito), ui-sans-serif, system-ui, sans-serif;
+  min-height: 100%;
+}
+
+h1,
+h2,
+h3,
+.display {
+  font-family: var(--font-fraunces), ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
+  letter-spacing: -0.03em;
+}
+
+button,
+a,
+input,
+textarea {
+  transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+:focus-visible {
+  outline: 3px solid var(--terracotta);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+.paper-card {
+  background: var(--cream);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+
+.grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
+}
