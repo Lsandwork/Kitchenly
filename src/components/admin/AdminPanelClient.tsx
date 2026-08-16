@@ -33,9 +33,12 @@ import {
 import {
   ADMIN_APP_PATH,
   ADMIN_DASHBOARD_NAV,
+  ADMIN_GENERATOR_TABS,
   ADMIN_MOBILE_TABS,
+  adminMobileTabLabel,
   adminPageTitle,
   isAdminPageId,
+  isGeneratorPage,
   type AdminNavBadgeKey,
   type AdminPageId,
 } from "@/components/admin/admin-nav";
@@ -320,6 +323,25 @@ function AdminPanelInner({ email, name, role }: Props) {
           </header>
 
           <div className="blog-dash__content">
+            {isGeneratorPage(page) ? (
+              <div className="blog-dash__gen-switch" aria-label="Choose generator">
+                {ADMIN_GENERATOR_TABS.map((tab) => {
+                  const Icon = ICONS[tab.id] || Wand2;
+                  const active = page === tab.id;
+                  return (
+                    <Link
+                      key={tab.id}
+                      href={`${ADMIN_APP_PATH}?page=${tab.id}`}
+                      aria-current={active ? "page" : undefined}
+                      className={`blog-dash__gen-switch-item${active ? " is-active" : ""}`}
+                    >
+                      <Icon className="h-4 w-4" aria-hidden />
+                      {tab.label} Generator
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : null}
             <AdminWorkspace page={page} searchQuery={search} onCounts={setCounts} />
           </div>
         </div>
@@ -333,13 +355,23 @@ function AdminPanelInner({ email, name, role }: Props) {
             <Link
               key={id}
               href={`${ADMIN_APP_PATH}?page=${id}`}
+              aria-current={active ? "page" : undefined}
               className={`blog-mobile-tabbar__item${active ? " is-active" : ""}`}
             >
               <Icon className="h-4 w-4" aria-hidden />
-              <span>{adminPageTitle(id).split(" ")[0]}</span>
+              <span>{adminMobileTabLabel(id)}</span>
             </Link>
           );
         })}
+        <button
+          type="button"
+          className="blog-mobile-tabbar__item"
+          onClick={() => setMobileOpen(true)}
+          aria-label="More admin sections"
+        >
+          <Menu className="h-4 w-4" aria-hidden />
+          <span>More</span>
+        </button>
       </nav>
     </div>
   );

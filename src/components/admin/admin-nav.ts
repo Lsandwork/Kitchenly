@@ -102,10 +102,35 @@ export function adminPageTitle(page: AdminPageId): string {
   return "Admin";
 }
 
+/**
+ * Mobile tab bar. Both generators get a slot because they are the primary reason
+ * to open Admin on a phone; everything else is one tap away behind "More".
+ */
 export const ADMIN_MOBILE_TABS: AdminPageId[] = [
   "overview",
   "users",
   "generate",
-  "calendar",
-  "analytics",
+  "social-generator",
 ];
+
+/** Short labels that survive a ~70px wide tab. */
+const MOBILE_TAB_LABELS: Partial<Record<AdminPageId, string>> = {
+  generate: "Blog",
+  "social-generator": "Social",
+  calendar: "Content",
+  analytics: "Product",
+};
+
+export function adminMobileTabLabel(page: AdminPageId): string {
+  return MOBILE_TAB_LABELS[page] ?? adminPageTitle(page).split(" ")[0];
+}
+
+/** Blog ↔ Social switcher shown on the generator pages when the sidebar is hidden. */
+export const ADMIN_GENERATOR_TABS: { id: AdminPageId; label: string }[] = [
+  { id: "generate", label: "Blog" },
+  { id: "social-generator", label: "Social" },
+];
+
+export function isGeneratorPage(page: AdminPageId): boolean {
+  return ADMIN_GENERATOR_TABS.some((tab) => tab.id === page);
+}

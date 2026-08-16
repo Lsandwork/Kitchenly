@@ -464,6 +464,45 @@
   display: flex;
 }
 
+/* The sidebar carries generator switching on desktop, so this is mobile-only. */
+.blog-dash__gen-switch {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .blog-dash__gen-switch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+    margin-bottom: 14px;
+    padding: 4px;
+    border: 1px solid var(--fitdog-border);
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: var(--blog-card-shadow);
+  }
+
+  .blog-dash__gen-switch-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    min-height: 42px;
+    border-radius: 999px;
+    color: var(--fitdog-muted);
+    font-size: 0.85rem;
+    font-weight: 750;
+    text-decoration: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .blog-dash__gen-switch-item.is-active {
+    background: var(--fitdog-orange);
+    color: #fff;
+  }
+}
+
 @media (max-width: 1024px) {
   .blog-dash__sidebar {
     transform: translateX(-100%);
