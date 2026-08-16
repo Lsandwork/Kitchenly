@@ -2,11 +2,30 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LeafIcon, ScanIcon, SparkleIcon } from "@/components/kf/icons";
 import { Button, ButtonLink, Chip, PageShell, SurfaceCard } from "@/components/ui";
 
 const LOCATIONS = ["fridge", "freezer", "pantry", "counter", "cabinet"] as const;
+
+const SCAN_PHASES = [
+  "Calibrating optics",
+  "Mapping shelf depth",
+  "Isolating objects",
+  "Reading labels",
+  "Identifying ingredients",
+  "Cross-checking your pantry",
+  "Ranking recipes",
+] as const;
+
+/** Fixed lock-on points so the reticles feel like detections, not random noise. */
+const RETICLES = [
+  { top: "22%", left: "18%", delay: "0.35s" },
+  { top: "38%", left: "63%", delay: "0.9s" },
+  { top: "62%", left: "31%", delay: "1.5s" },
+  { top: "71%", left: "74%", delay: "2.1s" },
+  { top: "48%", left: "45%", delay: "2.7s" },
+] as const;
 
 type ScanItem = {
   id: string;
@@ -38,6 +57,25 @@ export default function ScanPage() {
   const [recipes, setRecipes] = useState<RecipeIdea[]>([]);
   const [busy, setBusy] = useState(false);
   const [usedVision, setUsedVision] = useState<boolean | null>(null);
+  const [opening, setOpening] = useState<string | null>(null);
+  const [phase, setPhase] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  // Drive the scanning HUD: phases step forward, progress eases toward 96% and only
+  // completes when the request actually resolves.
+  useEffect(() => {
+    if (!busy) return;
+    const phaseTimer = window.setInterval(() => {
+      setPhase((current) => (current + 1) % SCAN_PHASES.length);
+    }, 1600);
+    const progressTimer = window.setInterval(() => {
+      setProgress((current) => current + (96 - current) * 0.12);
+    }, 240);
+    return () => {
+      window.clearInterval(phaseTimer);
+      window.clearInterval(progressTimer);
+    };
+  }, [busy]);
 
   function addFiles(list: FileList | null) {
     if (!list?.length) return;
@@ -49,9 +87,12 @@ export default function ScanPage() {
   async function scan(extra?: File[]) {
     const batch = extra ?? files;
     if (!batch.length) return;
+    setPhase(0);
+    setProgress(0);
     setBusy(true);
     setSpeech("Okay, I'm looking — give me a second with these shelves.");
     setRecipes([]);
+    setOpening(null);
     const form = new FormData();
     form.set("location", location);
     for (const file of batch) form.append("photos", file);
@@ -97,10 +138,6 @@ export default function ScanPage() {
     }
   }
 
-  function openRecipe(slug: string) {
-    router.push(`/recipes/${slug}?from=scan`);
-  }
-
   return (
     <PageShell narrow>
       <p className="kf-eyebrow">
@@ -132,26 +169,64 @@ export default function ScanPage() {
       />
 
       <SurfaceCard className="relative mt-6 overflow-hidden p-5 md:p-7">
-        <div className="relative mx-auto aspect-[4/3] max-w-lg overflow-hidden rounded-[28px] border border-[var(--kf-border-strong)] bg-[linear-gradient(180deg,#1f1814_0%,#3a2c24_100%)]">
-          <div className="absolute inset-[12%] rounded-[18px] border border-white/10 bg-black/20" />
-          <div className="pointer-events-none absolute inset-[18%] kf-scan-pulse" aria-hidden>
-            <span className="absolute left-0 top-0 h-8 w-8 border-l-[3px] border-t-[3px] border-white/90" />
-            <span className="absolute right-0 top-0 h-8 w-8 border-r-[3px] border-t-[3px] border-white/90" />
-            <span className="absolute bottom-0 left-0 h-8 w-8 border-b-[3px] border-l-[3px] border-white/90" />
-            <span className="absolute bottom-0 right-0 h-8 w-8 border-b-[3px] border-r-[3px] border-white/90" />
-          </div>
+        <div
+          className={`relative mx-auto aspect-[4/3] max-w-lg overflow-hidden rounded-[28px] border border-[var(--kf-border-strong)] bg-[linear-gradient(180deg,#1f1814_0%,#3a2c24_100%)] ${busy ? "kf-scan-active" : ""}`}
+        >
           {previews[0] ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={previews[0]} alt="" className="absolute inset-0 h-full w-full object-cover opacity-90" />
           ) : (
-            <div className="absolute inset-0 grid place-items-center px-6 text-center">
-              <div>
-                <p className="display text-2xl text-white">Point at a shelf</p>
-                <p className="mt-2 text-sm text-white/70">Warm light helps. One clear photo beats five blurry ones.</p>
+            <>
+              <div className="absolute inset-[12%] rounded-[18px] border border-white/10 bg-black/20" />
+              <div className="absolute inset-0 grid place-items-center px-6 text-center">
+                <div>
+                  <p className="display text-2xl text-white">Point at a shelf</p>
+                  <p className="mt-2 text-sm text-white/70">Warm light helps. One clear photo beats five blurry ones.</p>
+                </div>
               </div>
-            </div>
+            </>
           )}
+
+          {busy ? (
+            <div className="kf-scanfx" aria-hidden>
+              <div className="kf-scanfx-tint" />
+              <div className="kf-scanfx-mesh" />
+              <div className="kf-scanfx-beam" />
+              <div className="kf-scanfx-frame">
+                <span />
+                <span />
+                <span />
+                <span />
+              </div>
+              {RETICLES.map((spot) => (
+                <span
+                  key={`${spot.top}-${spot.left}`}
+                  className="kf-scanfx-reticle"
+                  style={{ top: spot.top, left: spot.left, animationDelay: spot.delay }}
+                />
+              ))}
+            </div>
+          ) : null}
+
+          {busy ? (
+            <div className="kf-scanfx-hud">
+              <p className="kf-scanfx-status">
+                <span className="kf-scanfx-live" />
+                {SCAN_PHASES[phase]}
+              </p>
+              <div className="kf-scanfx-meter">
+                <span style={{ width: `${Math.min(96, Math.max(6, progress))}%` }} />
+              </div>
+              <p className="kf-scanfx-readout">
+                Vision model active · {Math.round(Math.min(96, Math.max(6, progress)))}%
+              </p>
+            </div>
+          ) : null}
         </div>
+
+        <p className="sr-only" role="status" aria-live="polite">
+          {busy ? `Scanning your ${location}. ${SCAN_PHASES[phase]}.` : ""}
+        </p>
 
         <div className="mt-5 grid gap-3">
           <Button tone="olive" className="min-h-14 text-lg" onClick={() => inputRef.current?.click()}>
@@ -177,7 +252,7 @@ export default function ScanPage() {
       {files.length ? (
         <Button className="mt-4 w-full min-h-14" tone="ask" disabled={busy} onClick={() => void scan()}>
           <SparkleIcon size={16} />
-          {busy ? "Looking at your kitchen..." : `Scan ${files.length} photo${files.length > 1 ? "s" : ""}`}
+          {busy ? SCAN_PHASES[phase] + "..." : `Scan ${files.length} photo${files.length > 1 ? "s" : ""}`}
         </Button>
       ) : null}
 
@@ -224,11 +299,9 @@ export default function ScanPage() {
           </p>
           <div className="grid gap-4">
             {recipes.map((recipe) => (
-              <button
+              <div
                 key={recipe.slug}
-                type="button"
-                onClick={() => openRecipe(recipe.slug)}
-                className="kf-card block w-full cursor-pointer overflow-hidden rounded-[28px] text-left transition hover:-translate-y-0.5 hover:shadow-[var(--kf-shadow-floating)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--kf-olive)]"
+                className="kf-card relative overflow-hidden rounded-[28px] transition hover:-translate-y-0.5 hover:shadow-[var(--kf-shadow-floating)] focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--kf-olive)]"
               >
                 <div className="grid gap-0 sm:grid-cols-[8.5rem_1fr]">
                   <div className="relative min-h-36 bg-[var(--kf-background-deep)] sm:min-h-full">
@@ -241,7 +314,7 @@ export default function ScanPage() {
                       />
                     ) : null}
                   </div>
-                  <div className="relative z-[1] space-y-2 p-4">
+                  <div className="space-y-2 p-4">
                     <p className="text-sm font-bold text-[var(--kf-olive)]">
                       {recipe.kitchenMatchPercent}% Kitchen Match
                       {recipe.totalMinutes ? ` · ${recipe.totalMinutes} min` : ""}
@@ -265,10 +338,22 @@ export default function ScanPage() {
                         ))}
                       </ul>
                     ) : null}
-                    <p className="pt-1 text-sm font-bold text-[var(--kf-olive)]">Open recipe →</p>
+                    <p className="pt-1 text-sm font-bold text-[var(--kf-olive)]">
+                      {opening === recipe.slug ? "Opening recipe..." : "View recipe →"}
+                    </p>
                   </div>
                 </div>
-              </button>
+                {/* Full-card anchor: a real <a> so the whole card (image included) is tappable
+                    even before hydration, and long-press / open-in-new-tab keep working. */}
+                <Link
+                  href={`/recipes/${recipe.slug}?from=scan`}
+                  prefetch
+                  onClick={() => setOpening(recipe.slug)}
+                  className="absolute inset-0 z-10 touch-manipulation rounded-[28px] focus:outline-none"
+                >
+                  <span className="sr-only">View recipe: {recipe.title}</span>
+                </Link>
+              </div>
             ))}
           </div>
           <ButtonLink href="/recipes" tone="secondary">

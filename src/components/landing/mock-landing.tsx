@@ -301,14 +301,16 @@ export function MockLanding() {
                     Easy
                   </p>
                 </div>
+                <span className="kf-mock-dinner-next" aria-hidden>
+                  <ArrowIcon size={16} />
+                </span>
+                {/* Whole card is the tap target — the photo was previously dead on mobile. */}
                 <Link
                   href="/recipes/lemon-garlic-chicken-skillet"
-                  className="kf-mock-dinner-next"
-                  aria-label="View recipe"
+                  className="kf-mock-dinner-hit"
+                  aria-label="View recipe: Lemon Garlic Chicken & Veggies"
                   onClick={() => trackLanding("recipe_preview_click", { slug: "lemon-garlic-chicken-skillet" })}
-                >
-                  <ArrowIcon size={16} />
-                </Link>
+                />
               </div>
               <div className="kf-mock-dots" aria-hidden>
                 <span className="is-active" />

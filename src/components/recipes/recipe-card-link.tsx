@@ -26,7 +26,7 @@ export function RecipeCardLink({ card }: { card: RecipeCardData }) {
   return (
     <Link
       href={`/recipes/${card.slug}`}
-      className="kf-card group block overflow-hidden rounded-[28px] transition hover:-translate-y-0.5 hover:shadow-[var(--kf-shadow-floating)]"
+      className="kf-card group block touch-manipulation overflow-hidden rounded-[28px] transition hover:-translate-y-0.5 hover:shadow-[var(--kf-shadow-floating)] active:scale-[0.99]"
     >
       <div className="relative h-48 w-full" style={card.imageUrl ? undefined : plateStyle(card.title)}>
         {card.imageUrl ? (

@@ -297,6 +297,30 @@ export async function getRecipeDetail(userId: string, slug: string, servings?: n
   };
 }
 
+type RecipeDetail = NonNullable<Awaited<ReturnType<typeof getRecipeDetail>>>;
+
+/** Wire shape shared by the detail route handler and the server-rendered page. */
+export function recipeDetailPayload(detail: RecipeDetail, userEmail: string | null) {
+  return {
+    recipe: detail.recipe,
+    match: detail.match,
+    kitchenMatchPercent: detail.kitchenMatchPercent,
+    why: detail.why,
+    saved: detail.saved,
+    note: detail.note,
+    userRating: detail.userRating,
+    substitutions: detail.substitutions,
+    shopping: detail.shopping,
+    ratingAverage: detail.row.ratingAverage,
+    ratingCount: detail.row.ratingCount,
+    seoTitle: detail.row.seoTitle,
+    seoDescription: detail.row.seoDescription,
+    leftoverInstructions: detail.row.leftoverInstructions,
+    storageInstructions: detail.row.storageInstructions,
+    userEmail,
+  };
+}
+
 export async function shoppingListForRecipe(userId: string, slug: string, servings?: number) {
   const detail = await getRecipeDetail(userId, slug, servings);
   if (!detail) return null;

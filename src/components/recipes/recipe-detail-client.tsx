@@ -9,7 +9,7 @@ import { formatIngredient } from "@/domain/recipes/scale";
 
 type Ingredient = {
   name: string;
-  canonicalId: string;
+  canonicalId?: string;
   quantity?: number | null;
   unit?: string | null;
   optional?: boolean;
@@ -26,7 +26,7 @@ type Step = {
 type SubOption = {
   original: string;
   substitute: string;
-  substituteCanonicalId: string;
+  substituteCanonicalId?: string;
   explanation: string;
   flavorImpact: string;
 };
@@ -54,7 +54,7 @@ type Detail = {
   match: {
     state: string;
     available: { name: string; status: string }[];
-    missing: { name: string; canonicalId: string; quantity?: number | null; unit?: string | null }[];
+    missing: { name: string; canonicalId?: string; quantity?: number | null; unit?: string | null }[];
   };
   kitchenMatchPercent: number;
   why: string;
@@ -62,7 +62,7 @@ type Detail = {
   note: string;
   userRating: number | null;
   substitutions: Record<string, SubOption[]>;
-  shopping: { name: string; canonicalId: string; quantity?: number | null; unit?: string | null }[];
+  shopping: { name: string; canonicalId?: string; quantity?: number | null; unit?: string | null }[];
   ratingAverage: number;
   ratingCount: number;
   leftoverInstructions?: string | null;
@@ -79,15 +79,15 @@ function plateStyle(title: string) {
   };
 }
 
-export function RecipeDetailClient({ slug }: { slug: string }) {
+export function RecipeDetailClient({ slug, initialDetail = null }: { slug: string; initialDetail?: Detail | null }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [detail, setDetail] = useState<Detail | null>(null);
-  const [servings, setServings] = useState(4);
+  const [detail, setDetail] = useState<Detail | null>(initialDetail);
+  const [servings, setServings] = useState(initialDetail?.recipe.servings ?? 4);
   const [error, setError] = useState("");
   const [speech, setSpeech] = useState("");
   const [emailOpen, setEmailOpen] = useState(false);
-  const [emails, setEmails] = useState("");
+  const [emails, setEmails] = useState(initialDetail?.userEmail || "");
   const [includeShopping, setIncludeShopping] = useState(true);
   const [note, setNote] = useState("");
   const [ask, setAsk] = useState("");
@@ -114,6 +114,7 @@ export function RecipeDetailClient({ slug }: { slug: string }) {
   }
 
   useEffect(() => {
+    if (initialDetail && initialDetail.recipe.slug === slug) return;
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
@@ -131,10 +132,11 @@ export function RecipeDetailClient({ slug }: { slug: string }) {
 
   const effectiveMissing = useMemo(() => {
     if (!detail) return [];
-    return detail.match.missing.filter((item) => !appliedSubs[item.canonicalId]);
+    return detail.match.missing.filter((item) => !appliedSubs[item.canonicalId || item.name]);
   }, [detail, appliedSubs]);
 
-  const shoppingItems = shoppingPreview ?? detail?.shopping.filter((item) => !appliedSubs[item.canonicalId]) ?? [];
+  const shoppingItems =
+    shoppingPreview ?? detail?.shopping.filter((item) => !appliedSubs[item.canonicalId || item.name]) ?? [];
 
   if (error) {
     return (
@@ -298,11 +300,12 @@ export function RecipeDetailClient({ slug }: { slug: string }) {
             </div>
             <ul className="space-y-3">
               {recipe.ingredients.map((item) => {
+                const canonicalId = item.canonicalId || item.name;
                 const have = detail.match.available.some((row) => row.name === item.name && row.status !== "missing");
                 const missing = detail.match.missing.some((row) => row.canonicalId === item.canonicalId);
-                const sub = appliedSubs[item.canonicalId];
+                const sub = appliedSubs[canonicalId];
                 return (
-                  <li key={item.canonicalId + item.name} className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--kf-border)] pb-3">
+                  <li key={canonicalId + item.name} className="flex flex-wrap items-start justify-between gap-3 border-b border-[var(--kf-border)] pb-3">
                     <div>
                       <p className="font-semibold">
                         {have || sub ? "✓ " : missing ? "• " : ""}
@@ -355,13 +358,13 @@ export function RecipeDetailClient({ slug }: { slug: string }) {
                           type="button"
                           className="text-sm font-bold text-[var(--kf-terracotta)]"
                           onClick={() => {
-                            const options = detail.substitutions[item.canonicalId] || [];
+                            const options = detail.substitutions[canonicalId] || [];
                             const owned = options.find((option) =>
                               /you already have/i.test(option.explanation),
                             );
                             const pick = owned || options[0];
                             if (pick) {
-                              setAppliedSubs((prev) => ({ ...prev, [item.canonicalId]: pick.substitute }));
+                              setAppliedSubs((prev) => ({ ...prev, [canonicalId]: pick.substitute }));
                               setSpeech(`Using ${pick.substitute} instead of ${item.name}.`);
                             } else {
                               setSpeech(`No great substitute found for ${item.name} yet.`);

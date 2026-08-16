@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { collectionBySlug } from "@/domain/recipes/collections";
-import { requireUser } from "@/lib/auth";
+import { readSession, requireUser } from "@/lib/auth";
 import { itemListJsonLd, recipeCanonicalUrl, recipeJsonLd } from "@/lib/recipe-seo";
 import { RecipeDetailClient } from "@/components/recipes/recipe-detail-client";
 import { RecipeCardLink } from "@/components/recipes/recipe-card-link";
 import { PageShell, SectionTitle, SurfaceCard } from "@/components/ui";
-import { getRecipeBySlug, recipesForCollection } from "@/services/recipes";
+import { getRecipeBySlug, getRecipeDetail, recipeDetailPayload, recipesForCollection } from "@/services/recipes";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -114,6 +114,16 @@ export default async function RecipeSlugPage({ params }: Params) {
   const recipe = await getRecipeBySlug(slug);
   if (!recipe) notFound();
   const jsonLd = recipeJsonLd(recipe);
+  // Render the real recipe on the server for anyone who already has a session, so tapping a
+  // card paints content immediately instead of a skeleton waiting on a second round trip.
+  // Guests without a cookie fall through to the client fetch, which can mint the session.
+  const session = await readSession();
+  const initialDetail = session
+    ? await getRecipeDetail(session.id, slug)
+        .then((detail) => (detail ? recipeDetailPayload(detail, session.email) : null))
+        .catch(() => null)
+    : null;
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
@@ -123,7 +133,7 @@ export default async function RecipeSlugPage({ params }: Params) {
           <p>{recipe.description}</p>
         </main>
       </noscript>
-      <RecipeDetailClient slug={slug} />
+      <RecipeDetailClient slug={slug} initialDetail={initialDetail} />
     </>
   );
 }
