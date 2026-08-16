@@ -237,6 +237,8 @@ export async function scanPhotos(userId: string, files: File[], locationHint?: K
     }
   }
 
+  // Persist every detected edible as usable kitchen inventory so Kitchen Match
+  // can rank real recipes immediately. User can tap chips to remove mistakes.
   const saved = await upsertKitchenItems(
     userId,
     merged.map((item) => ({
@@ -254,7 +256,7 @@ export async function scanPhotos(userId: string, files: File[], locationHint?: K
       isUsable: item.likelyUsable ?? true,
       confidence: item.confidence,
       source: "scan",
-      confirmed: item.confidence >= 0.75,
+      confirmed: true,
       notes: item.notes,
     })),
   );
@@ -266,7 +268,15 @@ export async function scanPhotos(userId: string, files: File[], locationHint?: K
   let recipeIdeas: ScanRecipeIdea[] = [];
   try {
     const matched = await matchKitchenRecipes(userId);
-    recipeIdeas = matched.cards.slice(0, 6).map((card) => {
+    const scannedIds = new Set(saved.map((item) => item.canonicalId));
+    // Prefer recipes that actually use what we just saw — not random low matches.
+    const ranked = [...matched.cards].sort((a, b) => {
+      const aHits = a.recipe.ingredients.filter((ing) => ing.canonicalId && scannedIds.has(ing.canonicalId)).length;
+      const bHits = b.recipe.ingredients.filter((ing) => ing.canonicalId && scannedIds.has(ing.canonicalId)).length;
+      if (bHits !== aHits) return bHits - aHits;
+      return b.match.score - a.match.score;
+    });
+    recipeIdeas = ranked.slice(0, 6).map((card) => {
       const fromMatch = (card.match.substitutions || []).map((sub) => ({
         original: sub.original,
         substitute: sub.substitute,

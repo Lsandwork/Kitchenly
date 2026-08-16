@@ -314,25 +314,63 @@ export function RecipeDetailClient({ slug }: { slug: string }) {
                       </p>
                     </div>
                     {missing && !sub ? (
-                      <button
-                        type="button"
-                        className="text-sm font-bold text-[var(--kf-terracotta)]"
-                        onClick={() => {
-                          const options = detail.substitutions[item.canonicalId] || [];
-                          const owned = options.find((option) =>
-                            /you already have/i.test(option.explanation),
-                          );
-                          const pick = owned || options[0];
-                          if (pick) {
-                            setAppliedSubs((prev) => ({ ...prev, [item.canonicalId]: pick.substitute }));
-                            setSpeech(`Using ${pick.substitute} instead of ${item.name}.`);
-                          } else {
-                            setSpeech(`No great substitute found for ${item.name} yet.`);
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          className="rounded-full bg-[var(--kf-olive)] px-3 py-1.5 text-sm font-bold text-white"
+                          disabled={pending}
+                          onClick={() =>
+                            startTransition(() => {
+                              void act("have_ingredient", {
+                                missingCanonicalId: item.canonicalId,
+                                ingredientName: item.name,
+                                location: "pantry",
+                              })
+                                .then((data) => {
+                                  setSpeech(data.speech || `Added ${item.name} to your kitchen.`);
+                                  if (data.match) {
+                                    setDetail((current) =>
+                                      current
+                                        ? {
+                                            ...current,
+                                            match: data.match,
+                                            kitchenMatchPercent: data.kitchenMatchPercent,
+                                            why: data.why,
+                                            shopping: data.shopping ?? current.shopping,
+                                            substitutions: data.substitutions ?? current.substitutions,
+                                          }
+                                        : current,
+                                    );
+                                  } else {
+                                    load(servings);
+                                  }
+                                })
+                                .catch((error: Error) => setSpeech(error.message));
+                            })
                           }
-                        }}
-                      >
-                        I don’t have this
-                      </button>
+                        >
+                          I have this
+                        </button>
+                        <button
+                          type="button"
+                          className="text-sm font-bold text-[var(--kf-terracotta)]"
+                          onClick={() => {
+                            const options = detail.substitutions[item.canonicalId] || [];
+                            const owned = options.find((option) =>
+                              /you already have/i.test(option.explanation),
+                            );
+                            const pick = owned || options[0];
+                            if (pick) {
+                              setAppliedSubs((prev) => ({ ...prev, [item.canonicalId]: pick.substitute }));
+                              setSpeech(`Using ${pick.substitute} instead of ${item.name}.`);
+                            } else {
+                              setSpeech(`No great substitute found for ${item.name} yet.`);
+                            }
+                          }}
+                        >
+                          Find a sub
+                        </button>
+                      </div>
                     ) : null}
                   </li>
                 );
@@ -377,9 +415,47 @@ export function RecipeDetailClient({ slug }: { slug: string }) {
             {effectiveMissing.length ? (
               <div>
                 <p className="mb-2 text-sm font-bold uppercase tracking-[0.14em] text-[var(--kf-terracotta)]">Missing</p>
-                <ul className="space-y-1">
+                <ul className="space-y-2">
                   {effectiveMissing.map((item) => (
-                    <li key={item.canonicalId}>• {item.name}</li>
+                    <li key={item.canonicalId} className="flex flex-wrap items-center justify-between gap-2">
+                      <span>• {item.name}</span>
+                      <button
+                        type="button"
+                        className="rounded-full border border-[var(--kf-olive)] px-3 py-1 text-xs font-bold text-[var(--kf-olive)]"
+                        disabled={pending}
+                        onClick={() =>
+                          startTransition(() => {
+                            void act("have_ingredient", {
+                              missingCanonicalId: item.canonicalId,
+                              ingredientName: item.name,
+                              location: "pantry",
+                            })
+                              .then((data) => {
+                                setSpeech(data.speech || `Added ${item.name} to your kitchen.`);
+                                if (data.match) {
+                                  setDetail((current) =>
+                                    current
+                                      ? {
+                                          ...current,
+                                          match: data.match,
+                                          kitchenMatchPercent: data.kitchenMatchPercent,
+                                          why: data.why,
+                                          shopping: data.shopping ?? current.shopping,
+                                          substitutions: data.substitutions ?? current.substitutions,
+                                        }
+                                      : current,
+                                  );
+                                } else {
+                                  load(servings);
+                                }
+                              })
+                              .catch((error: Error) => setSpeech(error.message));
+                          })
+                        }
+                      >
+                        I have this
+                      </button>
+                    </li>
                   ))}
                 </ul>
               </div>

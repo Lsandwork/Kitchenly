@@ -29,6 +29,7 @@ const ActionSchema = z.object({
     "make_healthier",
     "make_cheaper",
     "make_faster",
+    "have_ingredient",
   ]),
   content: z.string().optional(),
   stars: z.number().min(1).max(5).optional(),
@@ -42,6 +43,8 @@ const ActionSchema = z.object({
   notes: z.string().optional(),
   missingCanonicalId: z.string().optional(),
   substituteCanonicalId: z.string().optional(),
+  ingredientName: z.string().optional(),
+  location: z.enum(["fridge", "freezer", "pantry", "counter", "cabinet", "unknown"]).optional(),
   date: z.string().optional(),
   mealType: z.string().optional(),
   leftovers: z
@@ -176,6 +179,40 @@ export async function POST(request: Request, { params }: Params) {
       });
       track("meal_plan_add", { slug });
       return json({ entry });
+    }
+
+    if (body.action === "have_ingredient") {
+      const missingId = body.missingCanonicalId?.trim();
+      const fromRecipe = detail.recipe.ingredients.find(
+        (item) => item.canonicalId === missingId || item.name.toLowerCase() === body.ingredientName?.toLowerCase(),
+      );
+      const canonicalId = missingId || fromRecipe?.canonicalId;
+      const name = body.ingredientName || fromRecipe?.name;
+      if (!canonicalId || !name) return fail("Tell me which ingredient you have.", 400);
+      await upsertKitchenItems(user.id, [
+        {
+          canonicalId,
+          name,
+          quantity: fromRecipe?.quantity ?? undefined,
+          unit: fromRecipe?.unit ?? undefined,
+          location: body.location || "pantry",
+          source: "manual",
+          confirmed: true,
+          isUsable: true,
+          confidence: 1,
+        },
+      ]);
+      track("inventory_updated_from_recipe", { slug, added: canonicalId });
+      const refreshed = await getRecipeDetail(user.id, slug, body.servings);
+      return json({
+        ok: true,
+        speech: `Got it — ${name} is in your kitchen now. Match updated.`,
+        match: refreshed?.match,
+        kitchenMatchPercent: refreshed?.kitchenMatchPercent,
+        why: refreshed?.why,
+        shopping: refreshed?.shopping,
+        substitutions: refreshed?.substitutions,
+      });
     }
 
     if (body.action === "substitute") {

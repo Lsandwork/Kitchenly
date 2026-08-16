@@ -11,7 +11,41 @@ function fold(value: string) {
     .trim();
 }
 
-const STOP = new Set(["fresh", "dried", "organic", "the", "a", "an", "some", "of", "and"]);
+const STOP = new Set([
+  "fresh",
+  "dried",
+  "organic",
+  "the",
+  "a",
+  "an",
+  "some",
+  "of",
+  "and",
+  "kirkland",
+  "trader",
+  "joes",
+  "joe",
+  "costco",
+  "whole",
+  "foods",
+  "store",
+  "brand",
+  "pack",
+  "package",
+  "bottle",
+  "jar",
+  "can",
+  "carton",
+  "box",
+]);
+
+function stripBrandNoise(value: string) {
+  return value
+    .replace(/\b(kirkland|trader joe'?s|costco|whole foods|great value|store brand)\b/gi, " ")
+    .replace(/\b(organic|natural|premium|family size)\b/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
 
 function tokens(value: string) {
   return fold(value)
@@ -35,7 +69,7 @@ export function normalizeIngredientName(raw: string): {
   displayName: string;
   confidence: number;
 } {
-  const cleaned = fold(raw);
+  const cleaned = fold(stripBrandNoise(raw));
   if (!cleaned) {
     return { ingredient: null, displayName: raw.trim(), confidence: 0 };
   }
@@ -74,7 +108,8 @@ export function normalizeIngredientName(raw: string): {
     };
   }
 
-  return { ingredient: null, displayName: raw.trim(), confidence: 0.2 };
+  const display = stripBrandNoise(raw.trim()) || raw.trim();
+  return { ingredient: null, displayName: display, confidence: 0.2 };
 }
 
 export function sameFamily(a?: string, b?: string) {

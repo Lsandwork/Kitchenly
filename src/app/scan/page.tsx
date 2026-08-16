@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -57,7 +56,7 @@ export default function ScanPage() {
     form.set("location", location);
     for (const file of batch) form.append("photos", file);
     try {
-      const res = await fetch("/api/scan", { method: "POST", body: form });
+      const res = await fetch("/api/scan", { method: "POST", body: form, credentials: "same-origin" });
       const data = await res.json();
       if (!res.ok) {
         setSpeech(data.error || "I couldn't read that clearly. Scan another photo, or just tell me what's there.");
@@ -83,6 +82,7 @@ export default function ScanPage() {
       await fetch("/api/kitchen", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({ id: item.id, names: [item.name] }),
       });
       setItems((current) => current.filter((row) => row.id !== item.id));
@@ -90,10 +90,15 @@ export default function ScanPage() {
       await fetch("/api/kitchen", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({ confirmIds: [item.id] }),
       });
       setItems((current) => current.map((row) => (row.id === item.id ? { ...row, confirmed: true } : row)));
     }
+  }
+
+  function openRecipe(slug: string) {
+    router.push(`/recipes/${slug}?from=scan`);
   }
 
   return (
@@ -197,7 +202,9 @@ export default function ScanPage() {
               </Chip>
             ))}
           </div>
-          <p className="text-[var(--kf-text-muted)]">Tap anything I got wrong. Then scan another shelf, or cook from these matches.</p>
+          <p className="text-[var(--kf-text-muted)]">
+            Tap anything I got wrong to remove it. Everything else is now in your kitchen for matching.
+          </p>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button tone="secondary" onClick={() => inputRef.current?.click()}>
               Scan another photo
@@ -210,23 +217,31 @@ export default function ScanPage() {
       ) : null}
 
       {recipes.length ? (
-        <section className="mt-10 space-y-4">
+        <section className="relative z-10 mt-10 space-y-4 pb-8">
           <h2 className="display text-3xl">Best matches from your kitchen</h2>
-          <p className="text-[var(--kf-text-muted)]">Ranked by Kitchen Match — with substitutes when you&apos;re one item short.</p>
+          <p className="text-[var(--kf-text-muted)]">
+            Ranked by what we just saw — tap a recipe to check ingredients and update your pantry.
+          </p>
           <div className="grid gap-4">
             {recipes.map((recipe) => (
-              <Link
+              <button
                 key={recipe.slug}
-                href={`/recipes/${recipe.slug}`}
-                className="kf-card block overflow-hidden rounded-[28px] transition hover:-translate-y-0.5 hover:shadow-[var(--kf-shadow-floating)]"
+                type="button"
+                onClick={() => openRecipe(recipe.slug)}
+                className="kf-card block w-full cursor-pointer overflow-hidden rounded-[28px] text-left transition hover:-translate-y-0.5 hover:shadow-[var(--kf-shadow-floating)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--kf-olive)]"
               >
                 <div className="grid gap-0 sm:grid-cols-[8.5rem_1fr]">
                   <div className="relative min-h-36 bg-[var(--kf-background-deep)] sm:min-h-full">
                     {recipe.imageUrl ? (
-                      <Image src={recipe.imageUrl} alt="" fill className="object-cover" sizes="160px" />
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={recipe.imageUrl}
+                        alt=""
+                        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+                      />
                     ) : null}
                   </div>
-                  <div className="space-y-2 p-4">
+                  <div className="relative z-[1] space-y-2 p-4">
                     <p className="text-sm font-bold text-[var(--kf-olive)]">
                       {recipe.kitchenMatchPercent}% Kitchen Match
                       {recipe.totalMinutes ? ` · ${recipe.totalMinutes} min` : ""}
@@ -234,7 +249,9 @@ export default function ScanPage() {
                     <h3 className="display text-2xl leading-tight">{recipe.title}</h3>
                     <p className="text-sm text-[var(--kf-text-muted)]">{recipe.why}</p>
                     {recipe.missing.length ? (
-                      <p className="text-sm text-[var(--kf-terracotta)]">Missing: {recipe.missing.slice(0, 4).join(", ")}</p>
+                      <p className="text-sm text-[var(--kf-terracotta)]">
+                        Missing: {recipe.missing.slice(0, 4).join(", ")}
+                      </p>
                     ) : (
                       <p className="text-sm font-semibold text-[var(--kf-olive)]">You can make this now.</p>
                     )}
@@ -242,15 +259,16 @@ export default function ScanPage() {
                       <ul className="space-y-1 text-sm text-[var(--kf-text-muted)]">
                         {recipe.substitutes.slice(0, 2).map((sub) => (
                           <li key={`${sub.original}-${sub.substitute}`}>
-                            Sub: use <span className="font-semibold text-[var(--kf-espresso)]">{sub.substitute}</span> for{" "}
-                            {sub.original}
+                            Sub: use <span className="font-semibold text-[var(--kf-espresso)]">{sub.substitute}</span>{" "}
+                            for {sub.original}
                           </li>
                         ))}
                       </ul>
                     ) : null}
+                    <p className="pt-1 text-sm font-bold text-[var(--kf-olive)]">Open recipe →</p>
                   </div>
                 </div>
-              </Link>
+              </button>
             ))}
           </div>
           <ButtonLink href="/recipes" tone="secondary">
