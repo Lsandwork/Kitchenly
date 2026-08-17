@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const name = labelFromSlug(slug);
   return {
-    title: `${name} recipes | Dishly`,
+    title: `${name} recipes`,
     description: `Browse ${name} recipes starting from your kitchen inventory.`,
     alternates: { canonical: `/recipes/categories/${slug}` },
   };

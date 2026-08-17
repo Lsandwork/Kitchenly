@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { RecipeDiscovery } from "@/components/recipes/recipe-discovery";
 
 export const metadata: Metadata = {
-  title: "Recipes that start with what you have | Dishly",
+  title: "Recipes that start with what you have",
   description:
     "Trending social dinners plus recipes matched to your kitchen. Smash burger tacos, creamy Cajun pasta, Kitchen Match, shopping lists, and cooking mode.",
   openGraph: {

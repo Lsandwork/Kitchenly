@@ -16,7 +16,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const collection = collectionBySlug(slug);
   if (collection) {
     return {
-      title: collection.seoTitle,
+      // seoTitle already carries the brand; the root template would append it twice.
+      title: { absolute: collection.seoTitle },
       description: collection.seoDescription,
       alternates: { canonical: `/recipes/${slug}` },
       openGraph: {
@@ -27,11 +28,11 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     };
   }
   const recipe = await getRecipeBySlug(slug);
-  if (!recipe) return { title: "Recipe not found | Dishly" };
+  if (!recipe) return { title: "Recipe not found" };
   const title = recipe.seoTitle || `${recipe.title} | Dishly`;
   const description = recipe.seoDescription || recipe.description;
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: { canonical: `/recipes/${slug}` },
     openGraph: {

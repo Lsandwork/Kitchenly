@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { HomeExperience } from "@/components/home-experience";
 
 export const metadata = {
-  title: "Tonight | Dishly",
+  title: "Tonight",
   description: "Figure out dinner from what’s already in your kitchen.",
   robots: { index: false, follow: true },
 };
