@@ -24,16 +24,16 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.APP_URL || "https://kitchen-friend.vercel.app"),
+  metadataBase: new URL(process.env.APP_URL || "https://getdishly.vercel.app"),
   title: {
-    default: "Kitchen Friend",
-    template: "%s | Kitchen Friend",
+    default: "Dishly",
+    template: "%s | Dishly",
   },
   description: "Turn what's in your kitchen into tonight's dinner.",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Kitchen Friend",
+    title: "Dishly",
   },
   formatDetection: {
     telephone: false,

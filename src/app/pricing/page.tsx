@@ -4,7 +4,7 @@ import { ButtonLink, PageShell } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Pricing",
-  description: "Kitchen Friend is free to start. Create your kitchen and cook with what you have.",
+  description: "Dishly is free to start. Create your kitchen and cook with what you have.",
 };
 
 export default function PricingPage() {
@@ -13,7 +13,7 @@ export default function PricingPage() {
       <p className="kf-eyebrow">Pricing</p>
       <h1 className="display text-5xl font-semibold">Start free. Cook smarter.</h1>
       <p className="text-lg text-[var(--kf-text-muted)]">
-        Create your Kitchen Friend account at no cost. Scan your kitchen, get Kitchen Match recipes, and shop only for
+        Create your Dishly account at no cost. Scan your kitchen, get Kitchen Match recipes, and shop only for
         what&apos;s missing.
       </p>
       <div className="kf-card rounded-[28px] p-6 space-y-3">
@@ -29,7 +29,7 @@ export default function PricingPage() {
         </ButtonLink>
       </div>
       <Link href="/" className="font-semibold text-[var(--kf-olive)]">
-        ← Back to Kitchen Friend
+        ← Back to Dishly
       </Link>
     </PageShell>
   );

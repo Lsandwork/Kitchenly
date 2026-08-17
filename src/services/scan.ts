@@ -171,7 +171,7 @@ async function analyzeImage(bytes: Buffer, mimeType: string, locationHint?: stri
 export async function scanPhotos(userId: string, files: File[], locationHint?: KitchenLocation) {
   if (!configuredAI()) {
     throw new AIUnavailableError(
-      "Kitchen Friend needs an AI vision key to read photos. Add OPENAI_API_KEY (or another vision provider), or type your ingredients instead.",
+      "Dishly needs an AI vision key to read photos. Add OPENAI_API_KEY (or another vision provider), or type your ingredients instead.",
     );
   }
 

@@ -15,7 +15,7 @@ const copy = {
     support: "Pick up your inventory, recipes, and tonight’s ideas.",
     submit: "Log in",
     panelTitle: "Log in",
-    panelLede: "Use the email and password for your Kitchen Friend account.",
+    panelLede: "Use the email and password for your Dishly account.",
     altPrompt: "New here?",
     altHref: "/signup",
     altLabel: "Create an account",
@@ -134,7 +134,7 @@ export function AuthForm({ mode, next }: { mode: Mode; next?: string }) {
             <span className="kf-auth-brand-mark" aria-hidden>
               <SproutIcon size={22} />
             </span>
-            <span className="display kf-auth-brand-name">Kitchen Friend</span>
+            <span className="display kf-auth-brand-name">Dishly</span>
           </Link>
           <h1 className="display kf-auth-headline">{text.headline}</h1>
           <p className="kf-auth-support">{text.support}</p>

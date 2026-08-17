@@ -36,7 +36,7 @@ export type AdminDashboardNavSection = {
 
 export const ADMIN_APP_PATH = "/admin";
 
-/** Kitchen Friend Admin information architecture. */
+/** Dishly Admin information architecture. */
 export const ADMIN_DASHBOARD_NAV: AdminDashboardNavSection[] = [
   {
     id: "main",

@@ -1,4 +1,4 @@
-# Kitchen Friend
+# Dishly
 
 An AI kitchen companion that looks at what you actually have, decides what you should cook, substitutes when it should, shops only for the gap, and walks you through dinner.
 
@@ -40,7 +40,7 @@ Never put secrets in client code. They stay on the server.
 ## What is real vs generated
 
 - **Existing recipes** from TheMealDB / Spoonacular keep their source name and URL. The app does not scrape copyrighted sites.
-- **Kitchen Friend originals** live in `src/data/owned-recipes.ts` and are labeled as original.
+- **Dishly originals** live in `src/data/owned-recipes.ts` and are labeled as original.
 - **AI-created recipes** are labeled “I made this one for your kitchen” and never presented as published.
 
 Store hours, shelf inventory, prices, and ratings are never invented. If a grocery API is not configured, you get local Maps search and a clear “likely nearby” disclaimer.

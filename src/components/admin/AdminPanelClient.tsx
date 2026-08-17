@@ -104,7 +104,7 @@ function AdminPanelInner({ email, name, role }: Props) {
   const initials = useMemo(() => {
     const parts = displayName.trim().split(/\s+/).filter(Boolean);
     if (parts.length >= 2) return `${parts[0]![0]}${parts[1]![0]}`.toUpperCase();
-    return (parts[0]?.slice(0, 2) || "KF").toUpperCase();
+    return (parts[0]?.slice(0, 2) || "DL").toUpperCase();
   }, [displayName]);
 
   useEffect(() => {
@@ -165,7 +165,7 @@ function AdminPanelInner({ email, name, role }: Props) {
           className={`blog-dash__sidebar${sidebarCollapsed ? " blog-dash__sidebar--collapsed" : ""}${
             mobileOpen ? " blog-dash__sidebar--open" : ""
           }`}
-          aria-label="Kitchen Friend Admin navigation"
+          aria-label="Dishly Admin navigation"
         >
           <div className="blog-dash__sidebar-brand">
             <span
@@ -173,11 +173,11 @@ function AdminPanelInner({ email, name, role }: Props) {
               style={{ background: "var(--fitdog-orange)" }}
               aria-hidden
             >
-              KF
+              D
             </span>
             {!sidebarCollapsed ? (
               <p className="blog-dash__wordmark">
-                kitchen <span>friend</span>
+                Dish<span>ly</span>
               </p>
             ) : null}
           </div>
@@ -239,7 +239,7 @@ function AdminPanelInner({ email, name, role }: Props) {
                 <Menu className="h-5 w-5" />
               </button>
               <div className="min-w-0">
-                <p className="blog-dash__app-brand">Kitchen Friend Admin</p>
+                <p className="blog-dash__app-brand">Dishly Admin</p>
                 <h1 className="blog-dash__title">
                   <span className="blog-dash__title-mobile">{title}</span>
                   <span className="blog-dash__title-desktop">Admin Panel</span>

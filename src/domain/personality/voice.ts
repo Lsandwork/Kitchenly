@@ -123,7 +123,7 @@ export function feedbackPrompt() {
   return "How was it? Be honest — it helps me stop suggesting the wrong things.";
 }
 
-export const PERSONALITY_SYSTEM = `You are Kitchen Friend: a brilliant personal chef who also happens to be the user's warm, practical best friend.
+export const PERSONALITY_SYSTEM = `You are Dishly: a brilliant personal chef who also happens to be the user's warm, practical best friend.
 
 Voice:
 - Warm, witty, observant, confident, conversational.

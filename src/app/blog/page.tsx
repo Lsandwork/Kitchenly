@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Notes from Kitchen Friend on cooking with what you already have.",
+  description: "Notes from Dishly on cooking with what you already have.",
 };
 
 export const dynamic = "force-dynamic";
@@ -56,7 +56,7 @@ export default async function BlogPage() {
       )}
 
       <Link href="/" className="font-semibold text-[var(--kf-olive)]">
-        ← Back to Kitchen Friend
+        ← Back to Dishly
       </Link>
     </PageShell>
   );

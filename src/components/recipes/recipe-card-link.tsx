@@ -33,7 +33,7 @@ export function RecipeCardLink({ card }: { card: RecipeCardData }) {
           <Image src={card.imageUrl} alt="" fill className="pointer-events-none object-cover" sizes="(max-width: 768px) 100vw, 360px" />
         ) : (
           <div className="flex h-full items-end p-5">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/85">Kitchen Friend</p>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-white/85">Dishly</p>
           </div>
         )}
         {typeof card.kitchenMatchPercent === "number" ? (

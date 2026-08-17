@@ -74,7 +74,7 @@ export default function MealPlanPage() {
 
   function copyShopping() {
     const text = [
-      "Weekly Shopping List — Kitchen Friend",
+      "Weekly Shopping List — Dishly",
       "",
       ...shopping.map((item) => {
         const qty = item.quantity != null ? ` — ${item.quantity}${item.unit ? ` ${item.unit}` : ""}` : "";

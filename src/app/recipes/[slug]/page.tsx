@@ -27,8 +27,8 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     };
   }
   const recipe = await getRecipeBySlug(slug);
-  if (!recipe) return { title: "Recipe not found | Kitchen Friend" };
-  const title = recipe.seoTitle || `${recipe.title} | Kitchen Friend`;
+  if (!recipe) return { title: "Recipe not found | Dishly" };
+  const title = recipe.seoTitle || `${recipe.title} | Dishly`;
   const description = recipe.seoDescription || recipe.description;
   return {
     title,

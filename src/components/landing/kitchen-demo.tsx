@@ -36,7 +36,7 @@ export function KitchenDemo() {
   }, []);
 
   return (
-    <div className="kf-landing-demo" aria-label="Kitchen Friend product demonstration">
+    <div className="kf-landing-demo" aria-label="Dishly product demonstration">
       <div
         className={`kf-landing-demo-stage ${step >= 1 ? "show-chips" : ""} ${step >= 2 ? "show-match" : ""} ${step >= 3 ? "show-shop" : ""}`}
       >

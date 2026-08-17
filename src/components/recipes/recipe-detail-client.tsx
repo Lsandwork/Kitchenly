@@ -172,7 +172,7 @@ export function RecipeDetailClient({ slug, initialDetail = null }: { slug: strin
               <Image src={recipe.imageUrl} alt="" fill priority className="object-cover" sizes="100vw" />
             ) : (
               <div className="absolute inset-0 flex items-end p-5 md:p-12">
-                <p className="text-sm font-bold uppercase tracking-[0.22em] text-white/80">Kitchen Friend recipe</p>
+                <p className="text-sm font-bold uppercase tracking-[0.22em] text-white/80">Dishly recipe</p>
               </div>
             )}
           </div>
@@ -558,7 +558,7 @@ export function RecipeDetailClient({ slug, initialDetail = null }: { slug: strin
         </SurfaceCard>
 
         <SurfaceCard className="space-y-4 p-6">
-          <h2 className="display text-3xl font-semibold">Ask Kitchen Friend</h2>
+          <h2 className="display text-3xl font-semibold">Ask Dishly</h2>
           <form
             className="flex flex-col gap-3 sm:flex-row"
             onSubmit={(event) => {

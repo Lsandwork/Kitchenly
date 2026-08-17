@@ -272,7 +272,7 @@ export async function POST(request: Request, { params }: Params) {
         remainingMissing,
         speech:
           remainingMissing.length === 0
-            ? "Your Kitchen Friend version is ready — no store trip needed."
+            ? "Your Dishly version is ready — no store trip needed."
             : `I adapted what I could. You're still missing ${remainingMissing.map((item) => item.name).join(" and ")}.`,
       });
     }
@@ -334,7 +334,7 @@ export async function POST(request: Request, { params }: Params) {
         const answer = await ai.completeText("fast", [
           {
             role: "system",
-            content: `You are Kitchen Friend, a warm cooking companion. Answer briefly and practically about this recipe only. Recipe: ${detail.recipe.title}. Ingredients: ${detail.recipe.ingredients.map((item) => item.name).join(", ")}. Steps: ${detail.recipe.steps.map((step) => step.instruction).join(" ")}`,
+            content: `You are Dishly, a warm cooking companion. Answer briefly and practically about this recipe only. Recipe: ${detail.recipe.title}. Ingredients: ${detail.recipe.ingredients.map((item) => item.name).join(", ")}. Steps: ${detail.recipe.steps.map((step) => step.instruction).join(" ")}`,
           },
           { role: "user", content: question },
         ]);

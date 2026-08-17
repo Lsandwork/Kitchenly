@@ -231,7 +231,7 @@ function OverviewPanel({ onCounts }: { onCounts?: (c: Counts) => void }) {
   return (
     <div className="blog-dash-panel blog-dash-panel--wide">
       <PanelHeader
-        title="Kitchen Friend Overview"
+        title="Dishly Overview"
         subtitle="Users, content pipeline, and recent kitchen activity."
         actions={
           <button type="button" className="blog-dash-toolbar-btn" onClick={() => void load()}>
@@ -690,7 +690,7 @@ function BlogListPanel({
     <div className="blog-dash-panel blog-dash-panel--wide">
       <PanelHeader
         title={title}
-        subtitle="Kitchen Friend blog pipeline."
+        subtitle="Dishly blog pipeline."
         actions={
           <Link href={`${ADMIN_APP_PATH}?page=generate`} className="blog-dash-toolbar-btn blog-dash-toolbar-btn--primary">
             <Wand2 className="mr-1 inline h-3.5 w-3.5" /> Generate
@@ -968,7 +968,7 @@ function BlogGeneratePanel() {
           <h3 className="mb-2 font-bold">Workflow</h3>
           <ol className="m-0 list-decimal space-y-2 pl-4 text-sm" style={{ color: "var(--fitdog-muted)" }}>
             <li>Enter a cooking or kitchen topic.</li>
-            <li>Generate an AI draft in Kitchen Friend voice.</li>
+            <li>Generate an AI draft in Dishly voice.</li>
             <li>Edit the markdown, then save.</li>
             <li>Schedule for the calendar or publish live.</li>
           </ol>
@@ -1205,7 +1205,7 @@ function CampaignsPanel() {
 
   return (
     <div className="blog-dash-panel blog-dash-panel--wide">
-      <PanelHeader title="Email Campaigns" subtitle="Create, schedule, and send Kitchen Friend emails." />
+      <PanelHeader title="Email Campaigns" subtitle="Create, schedule, and send Dishly emails." />
       {error ? <Alert kind="err">{error}</Alert> : null}
       {message ? <Alert kind="ok">{message}</Alert> : null}
       <div className="blog-dash-split mb-4">
@@ -1566,7 +1566,7 @@ function MediaPanel() {
 function SettingsPanel() {
   return (
     <div className="blog-dash-panel">
-      <PanelHeader title="Admin Settings" subtitle="Kitchen Friend ops preferences." />
+      <PanelHeader title="Admin Settings" subtitle="Dishly ops preferences." />
       <div className="blog-dash-form-panel">
         <label>
           <span className="blog-dash-label">Default blog tone</span>
@@ -1591,7 +1591,7 @@ function SettingsPanel() {
 function HelpPanel() {
   return (
     <div className="blog-dash-panel">
-      <PanelHeader title="How to use Admin" subtitle="Kitchen Friend content & growth ops." />
+      <PanelHeader title="How to use Admin" subtitle="Dishly content & growth ops." />
       <div className="blog-dash-form-panel">
         <ol className="m-0 list-decimal space-y-2 pl-5 text-sm" style={{ color: "var(--fitdog-body)" }}>
           <li>

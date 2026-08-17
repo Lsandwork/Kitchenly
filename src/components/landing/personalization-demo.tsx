@@ -44,7 +44,7 @@ export function PersonalizationDemo() {
         <p className="kf-eyebrow">Personalization</p>
         <h2 className="display kf-landing-h2">Your kitchen. Your rules.</h2>
         <p className="kf-landing-lede">
-          Tell Kitchen Friend once. Let it remember the details every night after that.
+          Tell Dishly once. Let it remember the details every night after that.
         </p>
       </div>
       <div className="kf-landing-personalization-grid">

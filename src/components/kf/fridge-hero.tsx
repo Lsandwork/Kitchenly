@@ -27,7 +27,7 @@ export function FridgeHero() {
             <span className="grid h-7 w-7 place-items-center rounded-full bg-[color-mix(in_srgb,var(--kf-terracotta)_12%,white)] text-[var(--kf-terracotta)]">
               <SparkleIcon size={14} />
             </span>
-            <p className="text-sm font-bold text-[var(--kf-espresso)]">Kitchen Friend</p>
+            <p className="text-sm font-bold text-[var(--kf-espresso)]">Dishly</p>
           </div>
           <p className="mt-2 text-[0.9rem] leading-snug text-[var(--kf-text-muted)]">
             I&apos;ve found 12 fresh ingredients.

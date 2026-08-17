@@ -237,7 +237,7 @@ export async function deleteAccount(userId: string) {
   await logout();
 }
 
-/** Ensure the Kitchen Friend admin account exists. Optionally reset password. */
+/** Ensure the Dishly admin account exists. Optionally reset password. */
 export async function ensureAdminUser(options?: { password?: string; resetPassword?: boolean }) {
   const email = ADMIN_EMAIL;
   const password = options?.password || getAdminPassword();

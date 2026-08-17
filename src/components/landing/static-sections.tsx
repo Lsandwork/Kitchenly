@@ -20,7 +20,7 @@ export function ProblemComparison() {
         Stop searching for recipes that assume you have a different kitchen.
       </h2>
       <p className="kf-landing-statement-support">
-        Kitchen Friend starts with <em>yours</em>.
+        Dishly starts with <em>yours</em>.
       </p>
       <div className="kf-landing-compare">
         <article className="kf-landing-compare-card is-old">
@@ -32,7 +32,7 @@ export function ProblemComparison() {
           </ol>
         </article>
         <article className="kf-landing-compare-card is-new">
-          <p className="kf-landing-field-label">Kitchen Friend</p>
+          <p className="kf-landing-field-label">Dishly</p>
           <ol>
             <li>Your kitchen</li>
             <li>Possibilities</li>
@@ -116,7 +116,7 @@ export function FeatureBento() {
             <ScanIcon size={14} /> Scan the kitchen
           </p>
           <h3 className="display text-3xl">Point. Scan. Done.</h3>
-          <p>Turn what Kitchen Friend sees into a kitchen you can actually cook from.</p>
+          <p>Turn what Dishly sees into a kitchen you can actually cook from.</p>
           <div className="kf-landing-bento-flow">
             <span>Camera</span>
             <span>→</span>
@@ -225,7 +225,7 @@ export function LandingFooter() {
           <span className="kf-landing-brand-mark">
             <SproutIcon size={16} />
           </span>
-          <span className="display kf-landing-brand-name">Kitchen Friend</span>
+          <span className="display kf-landing-brand-name">Dishly</span>
         </Link>
         <nav className="kf-landing-footer-nav" aria-label="Footer">
           <Link href="/recipes">Recipes</Link>

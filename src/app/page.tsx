@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { MockLanding } from "@/components/landing/mock-landing";
 
-const title = "Kitchen Friend | Turn What You Have Into Dinner";
+const title = "Dishly | Turn What You Have Into Dinner";
 const description =
-  "Scan your fridge, discover meals you can make with what you already have, and make dinner easier with Kitchen Friend.";
+  "Scan your fridge, discover meals you can make with what you already have, and make dinner easier with Dishly.";
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
     description,
     type: "website",
     url: "/",
-    siteName: "Kitchen Friend",
-    images: [{ url: "/assets/landing-hero-lifestyle.png", width: 1376, height: 768, alt: "Kitchen Friend" }],
+    siteName: "Dishly",
+    images: [{ url: "/assets/landing-hero-lifestyle.png", width: 1376, height: 768, alt: "Dishly" }],
   },
   twitter: {
     card: "summary_large_image",

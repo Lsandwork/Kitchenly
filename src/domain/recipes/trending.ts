@@ -1,4 +1,4 @@
-/** Curated social-trending ranking for Kitchen Friend Recipes.
+/** Curated social-trending ranking for Dishly Recipes.
  * Scores reflect relative social momentum (TikTok / Instagram / Pinterest),
  * not fabricated external search-volume APIs.
  */

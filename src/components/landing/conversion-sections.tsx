@@ -59,7 +59,7 @@ export function TonightFeature() {
           The hardest question in the kitchen shouldn&apos;t be &ldquo;what are we eating?&rdquo;
         </h2>
         <p className="kf-landing-lede">
-          Kitchen Friend looks at your kitchen and helps narrow dinner down to something you can actually make
+          Dishly looks at your kitchen and helps narrow dinner down to something you can actually make
           tonight.
         </p>
         <ButtonLink
@@ -103,7 +103,7 @@ export function AccountBenefits() {
     <section className="kf-landing-section kf-landing-account">
       <div className="kf-landing-section-head">
         <p className="kf-eyebrow">Why create an account</p>
-        <h2 className="display kf-landing-h2">Your Kitchen Friend gets better when it knows your kitchen.</h2>
+        <h2 className="display kf-landing-h2">Dishly gets better when it knows your kitchen.</h2>
       </div>
       <div className="kf-landing-account-grid">
         {[

@@ -211,7 +211,7 @@ export function HomeExperience() {
             }}
           >
             <label className="sr-only" htmlFor="ask">
-              Ask your kitchen friend
+              Ask Dishly
             </label>
             <div className="flex min-h-[3.6rem] items-center gap-2 rounded-full border border-[var(--kf-border-strong)] bg-[var(--kf-surface)] p-1.5 pl-5 shadow-[inset_0_1px_0_rgba(255,255,255,.7)] focus-within:border-[color-mix(in_srgb,var(--kf-terracotta)_45%,var(--kf-border-strong))] focus-within:shadow-[0_0_0_4px_rgba(192,86,33,.08)]">
               <input

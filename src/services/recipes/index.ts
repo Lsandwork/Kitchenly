@@ -62,6 +62,7 @@ function seedColumns(data: ReturnType<typeof recipeToSeedData>) {
     leftoverFriendly: data.leftoverFriendly,
     seoTitle: data.seoTitle,
     seoDescription: data.seoDescription,
+    sourceName: data.sourceName,
     status: "published",
   };
 }
@@ -82,16 +83,18 @@ async function syncOwnedRecipes() {
   });
 
   if (!stale.length) return;
-  await Promise.all(
-    stale.map((recipe) => {
-      const data = recipeToSeedData(recipe);
-      return db.recipe.upsert({
-        where: { slug: recipe.slug },
-        update: seedColumns(data),
-        create: { id: recipe.id, slug: recipe.slug, ...data },
-      });
-    }),
-  );
+  // Serverless runs against the transaction pooler with a connection limit of 1,
+  // so fanning these out with Promise.all exhausts the pool and times out. A
+  // rebrand or content edit makes every recipe stale at once, so this path has to
+  // survive the worst case, not just a one-row drift.
+  for (const recipe of stale) {
+    const data = recipeToSeedData(recipe);
+    await db.recipe.upsert({
+      where: { slug: recipe.slug },
+      update: seedColumns(data),
+      create: { id: recipe.id, slug: recipe.slug, ...data },
+    });
+  }
 }
 
 let seedSync: Promise<void> | null = null;

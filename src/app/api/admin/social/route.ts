@@ -31,14 +31,14 @@ function mapPost(post: {
 async function generateCaption(platform: string, topic: string, blogTitle?: string | null) {
   const ai = configuredAI();
   const subject = blogTitle ? `blog post "${blogTitle}"` : topic || "weeknight cooking";
-  const prompt = `Write a ${platform} caption for Kitchen Friend about ${subject}. Friendly, useful, 1-3 short paragraphs + 3-6 hashtags. No quotes around the whole caption.`;
+  const prompt = `Write a ${platform} caption for Dishly about ${subject}. Friendly, useful, 1-3 short paragraphs + 3-6 hashtags. No quotes around the whole caption.`;
 
   if (ai) {
     try {
       const text = await ai.completeText("fast", [
         {
           role: "system",
-          content: "You write social captions for Kitchen Friend, a fridge-to-dinner cooking app.",
+          content: "You write social captions for Dishly, a fridge-to-dinner cooking app.",
         },
         { role: "user", content: prompt },
       ]);
@@ -48,11 +48,11 @@ async function generateCaption(platform: string, topic: string, blogTitle?: stri
     }
   }
 
-  return `What's for dinner when the fridge looks random? Kitchen Friend matches recipes to what you already have — starting with ${topic || "tonight's leftovers"}.
+  return `What's for dinner when the fridge looks random? Dishly matches recipes to what you already have — starting with ${topic || "tonight's leftovers"}.
 
 Open the app, scan once, cook sooner. 🌿
 
-#KitchenFriend #WeeknightDinner #CookWhatYouHave #HomeCooking`;
+#Dishly #WeeknightDinner #CookWhatYouHave #HomeCooking`;
 }
 
 export async function GET() {

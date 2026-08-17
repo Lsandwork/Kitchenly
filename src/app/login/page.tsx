@@ -4,8 +4,8 @@ import { LoginClient } from "@/components/login-client";
 import { AuthForm } from "@/components/auth-form";
 
 export const metadata: Metadata = {
-  title: "Log in | Kitchen Friend",
-  description: "Log in to Kitchen Friend and pick up your kitchen, recipes, and meal plans.",
+  title: "Log in | Dishly",
+  description: "Log in to Dishly and pick up your kitchen, recipes, and meal plans.",
   robots: { index: false, follow: true },
 };
 

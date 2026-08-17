@@ -31,7 +31,7 @@ function mobileTitle(path: string) {
   if (/^\/recipes\/[^/]+/.test(path)) return "Recipe";
   if (path.startsWith("/cook")) return "Cooking";
   if (path === "/tonight") return "Tonight";
-  return links.find((link) => isActive(path, link.href))?.label ?? "Kitchen Friend";
+  return links.find((link) => isActive(path, link.href))?.label ?? "Dishly";
 }
 
 export function AppHeader() {
@@ -54,7 +54,7 @@ export function AppHeader() {
               <SproutIcon size={18} />
             </span>
             <span className="display truncate text-[1.25rem] font-semibold tracking-[-0.03em] text-[var(--kf-espresso)]">
-              Kitchen Friend
+              Dishly
             </span>
           </Link>
 
@@ -91,7 +91,7 @@ export function AppHeader() {
           </Link>
           <div className="min-w-0 flex-1">
             <p className="truncate text-[0.65rem] font-bold uppercase tracking-[0.18em] text-[var(--kf-terracotta)]">
-              Kitchen Friend
+              Dishly
             </p>
             <h1 className="display truncate text-[1.2rem] font-semibold leading-tight tracking-[-0.03em]">
               {title}

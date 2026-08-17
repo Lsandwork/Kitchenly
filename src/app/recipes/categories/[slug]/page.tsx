@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const name = labelFromSlug(slug);
   return {
-    title: `${name} recipes | Kitchen Friend`,
+    title: `${name} recipes | Dishly`,
     description: `Browse ${name} recipes starting from your kitchen inventory.`,
     alternates: { canonical: `/recipes/categories/${slug}` },
   };
@@ -41,7 +41,7 @@ export default async function CategoryRecipesPage({ params }: Params) {
   const list = filtered.length ? filtered : cards.slice(0, 12);
   const jsonLd = itemListJsonLd(
     `${name} recipes`,
-    `Kitchen Friend ${name} recipes.`,
+    `Dishly ${name} recipes.`,
     list.slice(0, 20).map((card) => ({
       name: card.recipe.title,
       url: recipeCanonicalUrl(card.recipe.slug),

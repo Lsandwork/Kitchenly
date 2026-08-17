@@ -5,7 +5,7 @@ import type { RecipeSource } from "@/providers/recipes/types";
 
 export class OwnedRecipeSource implements RecipeSource {
   id = "owned";
-  name = "Kitchen Friend";
+  name = "Dishly";
 
   available() {
     return true;

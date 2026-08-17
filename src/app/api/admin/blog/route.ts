@@ -56,7 +56,7 @@ async function generateMarkdown(topic: string, tone: string, length: string) {
   const ai = configuredAI();
   const lengthHint =
     length === "short" ? "400-600 words" : length === "long" ? "1200-1600 words" : "700-1000 words";
-  const system = `You are Kitchen Friend's blog writer. Warm, practical cooking advice. Olive-kitchen vibe. Output markdown only with a # title, short intro, and helpful sections. No JSON.`;
+  const system = `You are Dishly's blog writer. Warm, practical cooking advice. Olive-kitchen vibe. Output markdown only with a # title, short intro, and helpful sections. No JSON.`;
   const prompt = `Write a ${lengthHint} blog post about: ${topic}\nTone: ${tone}\nAudience: home cooks using what's already in the fridge.`;
 
   if (ai) {
@@ -73,7 +73,7 @@ async function generateMarkdown(topic: string, tone: string, length: string) {
 
   return `# ${topic.trim() || "Tonight from your kitchen"}
 
-Cooking with what you already have is the Kitchen Friend way.
+Cooking with what you already have is the Dishly way.
 
 ## Why this works
 A ${tone.replace(/_/g, " ")} approach keeps dinner decisions light: start with leftovers, add one fresh element, and finish with a simple sauce.
@@ -84,7 +84,7 @@ A ${tone.replace(/_/g, " ")} approach keeps dinner decisions light: start with l
 3. Season boldly with pantry staples.
 4. Plate and note what to shop next time.
 
-## Kitchen Friend tip
+## Dishly tip
 Scan your fridge before you decide — matching recipes to ingredients beats scrolling endlessly.
 
 *Draft generated for topic: ${topic}*
@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
         data: {
           slug,
           title,
-          excerpt: `Kitchen Friend guide: ${topic}`,
+          excerpt: `Dishly guide: ${topic}`,
           bodyMarkdown: markdown,
           status: "draft",
           category: body.category || "cooking",

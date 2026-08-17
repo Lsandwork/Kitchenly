@@ -39,7 +39,7 @@ export class InstacartProvider implements LocalShoppingProvider {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: request.recipeTitle ? `Missing for ${request.recipeTitle}` : "Kitchen Friend list",
+          title: request.recipeTitle ? `Missing for ${request.recipeTitle}` : "Dishly list",
           link_type: "shopping_list",
           expires_in: 14,
           line_items: request.items.map((item) => ({

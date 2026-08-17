@@ -25,7 +25,7 @@ export function recipeJsonLd(recipe: Recipe | RecipeRecord) {
     mainEntityOfPage: url,
     author: {
       "@type": "Organization",
-      name: record.sourceName || "Kitchen Friend",
+      name: record.sourceName || "Dishly",
     },
     recipeYield: `${record.servings} servings`,
     recipeIngredient: record.ingredients.map((item: RecipeIngredient) => {

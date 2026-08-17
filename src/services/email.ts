@@ -44,7 +44,7 @@ export function buildRecipeEmailHtml(payload: RecipeEmailPayload) {
   const parts: string[] = [];
   parts.push(`<div style="font-family:Georgia,serif;background:#f7f3eb;padding:24px;color:#2a1a12;">`);
   parts.push(`<div style="max-width:640px;margin:0 auto;background:#fff;border-radius:28px;padding:28px;border:1px solid rgba(42,26,18,.08);">`);
-  parts.push(`<p style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#c05621;font-weight:700;">Kitchen Friend</p>`);
+  parts.push(`<p style="font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#c05621;font-weight:700;">Dishly</p>`);
   parts.push(`<h1 style="font-size:32px;line-height:1.1;margin:8px 0 12px;">${escapeHtml(recipe.title)}</h1>`);
   parts.push(
     `<p style="color:#6b574c;margin:0 0 18px;">${recipe.totalMinutes ?? "—"} min · ${escapeHtml(recipe.difficulty)} · Serves ${recipe.servings}</p>`,
@@ -78,7 +78,7 @@ export function buildRecipeEmailHtml(payload: RecipeEmailPayload) {
     parts.push(`<h2 style="font-size:20px;margin:18px 0 8px;">Notes</h2><p>${escapeHtml(payload.notes)}</p>`);
   }
   if (payload.extraHtml) parts.push(payload.extraHtml);
-  parts.push(`<p style="margin-top:24px;"><a href="${url}" style="display:inline-block;background:#4a5d3f;color:#fff;text-decoration:none;padding:12px 18px;border-radius:999px;font-weight:700;">Open in Kitchen Friend</a></p>`);
+  parts.push(`<p style="margin-top:24px;"><a href="${url}" style="display:inline-block;background:#4a5d3f;color:#fff;text-decoration:none;padding:12px 18px;border-radius:999px;font-weight:700;">Open in Dishly</a></p>`);
   parts.push(`</div></div>`);
   return parts.join("");
 }
@@ -86,7 +86,7 @@ export function buildRecipeEmailHtml(payload: RecipeEmailPayload) {
 export function buildRecipeEmailText(payload: RecipeEmailPayload) {
   const recipe = payload.recipe;
   const lines = [
-    `Kitchen Friend`,
+    `Dishly`,
     recipe.title,
     `${recipe.totalMinutes ?? "—"} min · ${recipe.difficulty} · Serves ${recipe.servings}`,
     "",
@@ -117,7 +117,7 @@ export async function sendRecipeEmail(userId: string | null, payload: RecipeEmai
   if (!to.length) throw new Error("Add at least one email address.");
 
   const apiKey = env().RESEND_API_KEY;
-  const from = env().EMAIL_FROM || "Kitchen Friend <onboarding@resend.dev>";
+  const from = env().EMAIL_FROM || "Dishly <onboarding@resend.dev>";
 
   if (!hasValue(apiKey)) {
     const log = await db.emailSendLog.create({

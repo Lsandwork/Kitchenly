@@ -42,11 +42,11 @@ export function LandingHeader() {
   return (
     <header className={`kf-landing-header ${scrolled ? "is-scrolled" : ""}`}>
       <div className="kf-landing-header-inner">
-        <Link href="/" className="kf-landing-brand" aria-label="Kitchen Friend home">
+        <Link href="/" className="kf-landing-brand" aria-label="Dishly home">
           <span className="kf-landing-brand-mark">
             <SproutIcon size={18} />
           </span>
-          <span className="display kf-landing-brand-name">Kitchen Friend</span>
+          <span className="display kf-landing-brand-name">Dishly</span>
         </Link>
 
         <nav className="kf-landing-nav" aria-label="Landing">

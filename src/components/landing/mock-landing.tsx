@@ -116,7 +116,7 @@ export function MockLanding() {
             <span className="kf-mock-brand-mark">
               <SproutIcon size={18} />
             </span>
-            <span className="kf-mock-brand-name">Kitchen Friend</span>
+            <span className="kf-mock-brand-name">Dishly</span>
           </Link>
 
           <nav className="kf-mock-nav-links" aria-label="Primary">
@@ -233,11 +233,11 @@ export function MockLanding() {
           </section>
 
           {/* Visual */}
-          <section className="kf-mock-visual" aria-label="Kitchen Friend product preview">
+          <section className="kf-mock-visual" aria-label="Dishly product preview">
             <div className="kf-mock-photo">
               <Image
                 src="/assets/landing-hero-lifestyle.png"
-                alt="Home cook checking Kitchen Friend on her phone beside an open fridge"
+                alt="Home cook checking Dishly on her phone beside an open fridge"
                 fill
                 priority
                 sizes="(max-width: 1024px) 100vw, 58vw"
@@ -329,7 +329,7 @@ export function MockLanding() {
         </div>
 
         {/* Bottom prompt panel */}
-        <section className="kf-mock-prompt" aria-label="Ask Kitchen Friend">
+        <section className="kf-mock-prompt" aria-label="Ask Dishly">
           <div className="kf-mock-prompt-inner">
             <div className="kf-mock-prompt-main">
               <p className="kf-mock-prompt-label">Not sure what to make?</p>
@@ -341,7 +341,7 @@ export function MockLanding() {
                   value={prompt}
                   onChange={(event) => setPrompt(event.target.value)}
                   placeholder='Ask anything... e.g. "Something quick with chicken"'
-                  aria-label="Ask Kitchen Friend what to make"
+                  aria-label="Ask Dishly what to make"
                 />
                 <button type="submit" className="kf-mock-prompt-submit">
                   Get ideas
@@ -391,7 +391,7 @@ export function MockLanding() {
             <article>
               <span>01</span>
               <h3>Scan your kitchen</h3>
-              <p>Photograph your fridge or pantry and Kitchen Friend builds your inventory.</p>
+              <p>Photograph your fridge or pantry and Dishly builds your inventory.</p>
             </article>
             <article>
               <span>02</span>
@@ -436,7 +436,7 @@ export function MockLanding() {
           <span className="kf-mock-brand-mark">
             <SproutIcon size={16} />
           </span>
-          <span className="kf-mock-brand-name">Kitchen Friend</span>
+          <span className="kf-mock-brand-name">Dishly</span>
         </Link>
         <nav>
           <Link href="/recipes">Recipes</Link>

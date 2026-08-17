@@ -17,7 +17,7 @@ export function LandingHero() {
         <p className="kf-eyebrow">Your kitchen already knows dinner.</p>
         <h1 className="display kf-landing-hero-title">Dinner starts with what you already have.</h1>
         <p className="kf-landing-hero-lede">
-          Show Kitchen Friend what&apos;s in your fridge and pantry. We&apos;ll help you turn it into something worth
+          Show Dishly what&apos;s in your fridge and pantry. We&apos;ll help you turn it into something worth
           eating — and tell you exactly what&apos;s missing.
         </p>
         <div className="kf-landing-hero-actions">
