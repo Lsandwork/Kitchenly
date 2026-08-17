@@ -24,7 +24,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.APP_URL || "https://getdishly.vercel.app"),
+  metadataBase: new URL(process.env.APP_URL || "https://trydishly.vercel.app"),
   title: {
     default: "Dishly",
     template: "%s | Dishly",
